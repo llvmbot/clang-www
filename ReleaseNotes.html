@@ -1,0 +1,363 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Clang 11.0.0 (In-Progress) Release Notes &#8212; Clang 11 documentation</title>
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '11',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Clang Compiler User’s Manual" href="UsersManual.html" />
+    <link rel="prev" title="Using Clang as a Compiler" href="index.html" /> 
+  </head>
+  <body>
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Clang 11 documentation</span></a></h1>
+        <h2 class="heading"><span>Clang 11.0.0 (In-Progress) Release Notes</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Using Clang as a Compiler</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="UsersManual.html">Clang Compiler User’s Manual</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="clang-11-0-0-in-progress-release-notes">
+<h1>Clang 11.0.0 (In-Progress) Release Notes<a class="headerlink" href="#clang-11-0-0-in-progress-release-notes" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#introduction" id="id2">Introduction</a></li>
+<li><a class="reference internal" href="#what-s-new-in-clang-11-0-0" id="id3">What’s New in Clang 11.0.0?</a><ul>
+<li><a class="reference internal" href="#major-new-features" id="id4">Major New Features</a></li>
+<li><a class="reference internal" href="#non-comprehensive-list-of-changes-in-this-release" id="id5">Non-comprehensive list of changes in this release</a></li>
+<li><a class="reference internal" href="#new-compiler-flags" id="id6">New Compiler Flags</a></li>
+<li><a class="reference internal" href="#deprecated-compiler-flags" id="id7">Deprecated Compiler Flags</a></li>
+<li><a class="reference internal" href="#modified-compiler-flags" id="id8">Modified Compiler Flags</a></li>
+<li><a class="reference internal" href="#new-pragmas-in-clang" id="id9">New Pragmas in Clang</a></li>
+<li><a class="reference internal" href="#attribute-changes-in-clang" id="id10">Attribute Changes in Clang</a></li>
+<li><a class="reference internal" href="#windows-support" id="id11">Windows Support</a></li>
+<li><a class="reference internal" href="#c-language-changes-in-clang" id="id12">C Language Changes in Clang</a></li>
+<li><a class="reference internal" href="#id1" id="id13">C++ Language Changes in Clang</a></li>
+<li><a class="reference internal" href="#objective-c-language-changes-in-clang" id="id14">Objective-C Language Changes in Clang</a></li>
+<li><a class="reference internal" href="#opencl-c-language-changes-in-clang" id="id15">OpenCL C Language Changes in Clang</a></li>
+<li><a class="reference internal" href="#abi-changes-in-clang" id="id16">ABI Changes in Clang</a></li>
+<li><a class="reference internal" href="#openmp-support-in-clang" id="id17">OpenMP Support in Clang</a></li>
+<li><a class="reference internal" href="#cuda-support-in-clang" id="id18">CUDA Support in Clang</a></li>
+<li><a class="reference internal" href="#internal-api-changes" id="id19">Internal API Changes</a></li>
+<li><a class="reference internal" href="#build-system-changes" id="id20">Build System Changes</a></li>
+<li><a class="reference internal" href="#ast-matchers" id="id21">AST Matchers</a></li>
+<li><a class="reference internal" href="#clang-format" id="id22">clang-format</a></li>
+<li><a class="reference internal" href="#libclang" id="id23">libclang</a></li>
+<li><a class="reference internal" href="#static-analyzer" id="id24">Static Analyzer</a></li>
+<li><a class="reference internal" href="#undefined-behavior-sanitizer-ubsan" id="id25">Undefined Behavior Sanitizer (UBSan)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core-analysis-improvements" id="id26">Core Analysis Improvements</a></li>
+<li><a class="reference internal" href="#new-issues-found" id="id27">New Issues Found</a><ul>
+<li><a class="reference internal" href="#python-binding-changes" id="id28">Python Binding Changes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#significant-known-problems" id="id29">Significant Known Problems</a></li>
+<li><a class="reference internal" href="#additional-information" id="id30">Additional Information</a></li>
+</ul>
+</div>
+<p>Written by the <a class="reference external" href="https://llvm.org/">LLVM Team</a></p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">These are in-progress notes for the upcoming Clang 11 release.
+Release notes for previous releases can be found on
+<a class="reference external" href="https://releases.llvm.org/download.html">the Download Page</a>.</p>
+</div>
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#id2">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This document contains the release notes for the Clang C/C++/Objective-C
+frontend, part of the LLVM Compiler Infrastructure, release 11.0.0. Here we
+describe the status of Clang in some detail, including major
+improvements from the previous release and new feature work. For the
+general LLVM release notes, see <a class="reference external" href="https://llvm.org/docs/ReleaseNotes.html">the LLVM
+documentation</a>. All LLVM
+releases may be downloaded from the <a class="reference external" href="https://llvm.org/releases/">LLVM releases web
+site</a>.</p>
+<p>For more information about Clang or LLVM, including information about the
+latest release, please see the <a class="reference external" href="https://clang.llvm.org">Clang Web Site</a> or the
+<a class="reference external" href="https://llvm.org">LLVM Web Site</a>.</p>
+<p>Note that if you are reading this file from a Git checkout or the
+main Clang web page, this document applies to the <em>next</em> release, not
+the current one. To see the release notes for a specific release, please
+see the <a class="reference external" href="https://llvm.org/releases/">releases page</a>.</p>
+</div>
+<div class="section" id="what-s-new-in-clang-11-0-0">
+<h2><a class="toc-backref" href="#id3">What’s New in Clang 11.0.0?</a><a class="headerlink" href="#what-s-new-in-clang-11-0-0" title="Permalink to this headline">¶</a></h2>
+<p>Some of the major new features and improvements to Clang are listed
+here. Generic improvements to Clang as a whole or to its underlying
+infrastructure are described first, followed by language-specific
+sections with improvements to Clang’s support for those languages.</p>
+<div class="section" id="major-new-features">
+<h3><a class="toc-backref" href="#id4">Major New Features</a><a class="headerlink" href="#major-new-features" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+<div class="section" id="improvements-to-clang-s-diagnostics">
+<h4>Improvements to Clang’s diagnostics<a class="headerlink" href="#improvements-to-clang-s-diagnostics" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+</div>
+<div class="section" id="non-comprehensive-list-of-changes-in-this-release">
+<h3><a class="toc-backref" href="#id5">Non-comprehensive list of changes in this release</a><a class="headerlink" href="#non-comprehensive-list-of-changes-in-this-release" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="new-compiler-flags">
+<h3><a class="toc-backref" href="#id6">New Compiler Flags</a><a class="headerlink" href="#new-compiler-flags" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>-fstack-clash-protection will provide a protection against the stack clash
+attack for x86 architecture through automatic probing of each page of
+allocated stack.</li>
+</ul>
+</div>
+<div class="section" id="deprecated-compiler-flags">
+<h3><a class="toc-backref" href="#id7">Deprecated Compiler Flags</a><a class="headerlink" href="#deprecated-compiler-flags" title="Permalink to this headline">¶</a></h3>
+<p>The following options are deprecated and ignored. They will be removed in
+future versions of Clang.</p>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="modified-compiler-flags">
+<h3><a class="toc-backref" href="#id8">Modified Compiler Flags</a><a class="headerlink" href="#modified-compiler-flags" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="new-pragmas-in-clang">
+<h3><a class="toc-backref" href="#id9">New Pragmas in Clang</a><a class="headerlink" href="#new-pragmas-in-clang" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="attribute-changes-in-clang">
+<h3><a class="toc-backref" href="#id10">Attribute Changes in Clang</a><a class="headerlink" href="#attribute-changes-in-clang" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="windows-support">
+<h3><a class="toc-backref" href="#id11">Windows Support</a><a class="headerlink" href="#windows-support" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="c-language-changes-in-clang">
+<h3><a class="toc-backref" href="#id12">C Language Changes in Clang</a><a class="headerlink" href="#c-language-changes-in-clang" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+<div class="section" id="c11-feature-support">
+<h4>C11 Feature Support<a class="headerlink" href="#c11-feature-support" title="Permalink to this headline">¶</a></h4>
+<p>…</p>
+</div>
+</div>
+<div class="section" id="id1">
+<h3><a class="toc-backref" href="#id13">C++ Language Changes in Clang</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Clang now implements a restriction on giving non-C-compatible anonymous
+structs a typedef name for linkage purposes, as described in C++ committee
+paper <cite>P1766R1 &lt;http://wg21.link/p1766r1&gt;</cite>. This paper was adopted by the
+C++ committee as a Defect Report resolution, so it is applied retroactively
+to all C++ standard versions. This affects code such as:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">f</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span> <span class="n">S</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Previous versions of Clang rejected some constructs of this form
+(specifically, where the linkage of the type happened to be computed
+before the parser reached the typedef name); those cases are still rejected
+in Clang 11.  In addition, cases that previous versions of Clang did not
+reject now produce an extension warning. This warning can be disabled with
+the warning flag <code class="docutils literal"><span class="pre">-Wno-non-c-typedef-for-linkage</span></code>.</p>
+<p>Affected code should be updated to provide a tag name for the anonymous
+struct:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">S</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">f</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>If the code is shared with a C compilation (for example, if the parts that
+are not C-compatible are guarded with <code class="docutils literal"><span class="pre">#ifdef</span> <span class="pre">__cplusplus</span></code>), the typedef
+declaration should be retained, but a tag name should still be provided:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">S</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">f</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span> <span class="n">S</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="section" id="c-1z-feature-support">
+<h4>C++1z Feature Support<a class="headerlink" href="#c-1z-feature-support" title="Permalink to this headline">¶</a></h4>
+<p>…</p>
+</div>
+</div>
+<div class="section" id="objective-c-language-changes-in-clang">
+<h3><a class="toc-backref" href="#id14">Objective-C Language Changes in Clang</a><a class="headerlink" href="#objective-c-language-changes-in-clang" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="opencl-c-language-changes-in-clang">
+<h3><a class="toc-backref" href="#id15">OpenCL C Language Changes in Clang</a><a class="headerlink" href="#opencl-c-language-changes-in-clang" title="Permalink to this headline">¶</a></h3>
+<p>…</p>
+</div>
+<div class="section" id="abi-changes-in-clang">
+<h3><a class="toc-backref" href="#id16">ABI Changes in Clang</a><a class="headerlink" href="#abi-changes-in-clang" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="openmp-support-in-clang">
+<h3><a class="toc-backref" href="#id17">OpenMP Support in Clang</a><a class="headerlink" href="#openmp-support-in-clang" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="cuda-support-in-clang">
+<h3><a class="toc-backref" href="#id18">CUDA Support in Clang</a><a class="headerlink" href="#cuda-support-in-clang" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="internal-api-changes">
+<h3><a class="toc-backref" href="#id19">Internal API Changes</a><a class="headerlink" href="#internal-api-changes" title="Permalink to this headline">¶</a></h3>
+<p>These are major API changes that have happened since the 10.0.0 release of
+Clang. If upgrading an external codebase that uses Clang as a library,
+this section should help get you past the largest hurdles of upgrading.</p>
+</div>
+<div class="section" id="build-system-changes">
+<h3><a class="toc-backref" href="#id20">Build System Changes</a><a class="headerlink" href="#build-system-changes" title="Permalink to this headline">¶</a></h3>
+<p>These are major changes to the build system that have happened since the 10.0.0
+release of Clang. Users of the build system should adjust accordingly.</p>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="ast-matchers">
+<h3><a class="toc-backref" href="#id21">AST Matchers</a><a class="headerlink" href="#ast-matchers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="clang-format">
+<h3><a class="toc-backref" href="#id22">clang-format</a><a class="headerlink" href="#clang-format" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Option <code class="docutils literal"><span class="pre">IndentCaseBlocks</span></code> has been added to support treating the block
+following a switch case label as a scope block which gets indented itself.
+It helps avoid having the closing bracket align with the switch statement’s
+closing bracket (when <code class="docutils literal"><span class="pre">IndentCaseLabels</span></code> is <code class="docutils literal"><span class="pre">false</span></code>).</p>
+</li>
+<li><p class="first">Option <code class="docutils literal"><span class="pre">ObjCBreakBeforeNestedBlockParam</span></code> has been added to optionally apply
+linebreaks for function arguments declarations before nested blocks.</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">switch</span> <span class="p">(</span><span class="n">fool</span><span class="p">)</span> <span class="p">{</span>                <span class="n">vs</span><span class="p">.</span>     <span class="k">switch</span> <span class="p">(</span><span class="n">fool</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">case</span> <span class="mi">1</span><span class="o">:</span>                                <span class="k">case</span> <span class="mi">1</span><span class="o">:</span> <span class="p">{</span>
+  <span class="p">{</span>                                      <span class="n">bar</span><span class="p">();</span>
+     <span class="n">bar</span><span class="p">();</span>                            <span class="p">}</span> <span class="k">break</span><span class="p">;</span>
+  <span class="p">}</span>                                    <span class="k">default</span><span class="o">:</span> <span class="p">{</span>
+  <span class="k">break</span><span class="p">;</span>                                 <span class="n">plop</span><span class="p">();</span>
+<span class="k">default</span><span class="o">:</span>                               <span class="p">}</span>
+  <span class="p">{</span>                                    <span class="p">}</span>
+    <span class="n">plop</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Option <code class="docutils literal"><span class="pre">InsertTrailingCommas</span></code> can be set to <code class="docutils literal"><span class="pre">TCS_Wrapped</span></code> to insert
+trailing commas in container literals (arrays and objects) that wrap across
+multiple lines. It is currently only available for JavaScript and disabled by
+default (<code class="docutils literal"><span class="pre">TCS_None</span></code>).</p>
+</li>
+</ul>
+</div>
+<div class="section" id="libclang">
+<h3><a class="toc-backref" href="#id23">libclang</a><a class="headerlink" href="#libclang" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="static-analyzer">
+<h3><a class="toc-backref" href="#id24">Static Analyzer</a><a class="headerlink" href="#static-analyzer" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="undefined-behavior-sanitizer-ubsan">
+<span id="release-notes-ubsan"></span><h3><a class="toc-backref" href="#id25">Undefined Behavior Sanitizer (UBSan)</a><a class="headerlink" href="#undefined-behavior-sanitizer-ubsan" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="core-analysis-improvements">
+<h2><a class="toc-backref" href="#id26">Core Analysis Improvements</a><a class="headerlink" href="#core-analysis-improvements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+<div class="section" id="new-issues-found">
+<h2><a class="toc-backref" href="#id27">New Issues Found</a><a class="headerlink" href="#new-issues-found" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>…</li>
+</ul>
+<div class="section" id="python-binding-changes">
+<h3><a class="toc-backref" href="#id28">Python Binding Changes</a><a class="headerlink" href="#python-binding-changes" title="Permalink to this headline">¶</a></h3>
+<p>The following methods have been added:</p>
+<ul class="simple">
+<li>…</li>
+</ul>
+</div>
+</div>
+<div class="section" id="significant-known-problems">
+<h2><a class="toc-backref" href="#id29">Significant Known Problems</a><a class="headerlink" href="#significant-known-problems" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="additional-information">
+<h2><a class="toc-backref" href="#id30">Additional Information</a><a class="headerlink" href="#additional-information" title="Permalink to this headline">¶</a></h2>
+<p>A wide variety of additional information is available on the <a class="reference external" href="https://clang.llvm.org/">Clang web
+page</a>. The web page contains versions of the
+API documentation which are up-to-date with the Subversion version of
+the source code. You can access versions of these documents specific to
+this release by going into the “<code class="docutils literal"><span class="pre">clang/docs/</span></code>” directory in the Clang
+tree.</p>
+<p>If you have any questions or comments about Clang, please feel free to
+contact us via the <a class="reference external" href="https://lists.llvm.org/mailman/listinfo/cfe-dev">mailing
+list</a>.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Using Clang as a Compiler</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="UsersManual.html">Clang Compiler User’s Manual</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2007-2020, The Clang Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>
