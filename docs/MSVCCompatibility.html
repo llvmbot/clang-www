@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>MSVC compatibility &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="OpenCL Support" href="OpenCLSupport.html" />
     <link rel="prev" title="Modules" href="Modules.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>MSVC compatibility</span></h2>
@@ -61,13 +52,13 @@ ABI is a work in progress.  If you don’t require MSVC ABI compatibility or don
 want to use Microsoft’s C and C++ runtimes, the mingw32 toolchain might be a
 better fit for your project.</p>
 <p>Second, Clang implements many MSVC language extensions, such as
-<code class="docutils literal"><span class="pre">__declspec(dllexport)</span></code> and a handful of pragmas.  These are typically
-controlled by <code class="docutils literal"><span class="pre">-fms-extensions</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">__declspec(dllexport)</span></code> and a handful of pragmas.  These are typically
+controlled by <code class="docutils literal notranslate"><span class="pre">-fms-extensions</span></code>.</p>
 <p>Third, MSVC accepts some C++ code that Clang will typically diagnose as
 invalid.  When these constructs are present in widely included system headers,
 Clang attempts to recover and continue compiling the user’s program.  Most
 parsing and semantic compatibility tweaks are controlled by
-<code class="docutils literal"><span class="pre">-fms-compatibility</span></code> and <code class="docutils literal"><span class="pre">-fdelayed-template-parsing</span></code>, and they are a work
+<code class="docutils literal notranslate"><span class="pre">-fms-compatibility</span></code> and <code class="docutils literal notranslate"><span class="pre">-fdelayed-template-parsing</span></code>, and they are a work
 in progress.</p>
 <p>Finally, there is <a class="reference internal" href="UsersManual.html#clang-cl"><span class="std std-ref">clang-cl</span></a>, a driver program for clang that attempts to
 be compatible with MSVC’s cl.exe.</p>
@@ -98,14 +89,14 @@ base class</a>.  Clang does not yet support this.</li>
 </ul>
 <ul class="simple">
 <li>Debug info: <span class="good">Mostly complete</span>.  Clang emits relatively complete CodeView
-debug information if <code class="docutils literal"><span class="pre">/Z7</span></code> or <code class="docutils literal"><span class="pre">/Zi</span></code> is passed. Microsoft’s link.exe will
+debug information if <code class="docutils literal notranslate"><span class="pre">/Z7</span></code> or <code class="docutils literal notranslate"><span class="pre">/Zi</span></code> is passed. Microsoft’s link.exe will
 transform the CodeView debug information into a PDB that works in Windows
 debuggers and other tools that consume PDB files like ETW. Work to teach lld
 about CodeView and PDBs is ongoing.</li>
 <li>RTTI: <span class="good">Complete</span>.  Generation of RTTI data structures has been
-finished, along with support for the <code class="docutils literal"><span class="pre">/GR</span></code> flag.</li>
+finished, along with support for the <code class="docutils literal notranslate"><span class="pre">/GR</span></code> flag.</li>
 <li>C++ Exceptions: <span class="good">Mostly complete</span>.  Support for
-C++ exceptions (<code class="docutils literal"><span class="pre">try</span></code> / <code class="docutils literal"><span class="pre">catch</span></code> / <code class="docutils literal"><span class="pre">throw</span></code>) have been implemented for
+C++ exceptions (<code class="docutils literal notranslate"><span class="pre">try</span></code> / <code class="docutils literal notranslate"><span class="pre">catch</span></code> / <code class="docutils literal notranslate"><span class="pre">throw</span></code>) have been implemented for
 x86 and x64.  Our implementation has been well tested but we still get the
 odd bug report now and again.
 C++ exception specifications are ignored, but this is <a class="reference external" href="https://msdn.microsoft.com/en-us/library/wfa0edys.aspx">consistent with Visual
@@ -113,11 +104,11 @@ C++</a>.</li>
 </ul>
 <ul class="simple">
 <li>Asynchronous Exceptions (SEH): <span class="partial">Partial</span>.
-Structured exceptions (<code class="docutils literal"><span class="pre">__try</span></code> / <code class="docutils literal"><span class="pre">__except</span></code> / <code class="docutils literal"><span class="pre">__finally</span></code>) mostly
+Structured exceptions (<code class="docutils literal notranslate"><span class="pre">__try</span></code> / <code class="docutils literal notranslate"><span class="pre">__except</span></code> / <code class="docutils literal notranslate"><span class="pre">__finally</span></code>) mostly
 work on x86 and x64.
 LLVM does not model asynchronous exceptions, so it is currently impossible to
 catch an asynchronous exception generated in the same frame as the catching
-<code class="docutils literal"><span class="pre">__try</span></code>.</li>
+<code class="docutils literal notranslate"><span class="pre">__try</span></code>.</li>
 <li>Thread-safe initialization of local statics: <span class="good">Complete</span>.  MSVC 2015
 added support for thread-safe initialization of such variables by taking an
 ABI break.
@@ -138,7 +129,7 @@ libraries such as the Active Template Library (ATL) and Windows Runtime Library
 <p>The first major semantic difference is that MSVC appears to defer all parsing
 an analysis of inline method bodies in class templates until instantiation
 time.  By default on Windows, Clang attempts to follow suit.  This behavior is
-controlled by the <code class="docutils literal"><span class="pre">-fdelayed-template-parsing</span></code> flag.  While Clang delays
+controlled by the <code class="docutils literal notranslate"><span class="pre">-fdelayed-template-parsing</span></code> flag.  While Clang delays
 parsing of method bodies, it still parses the bodies <em>before</em> template argument
 substitution, which is not what MSVC does.  The following compatibility tweaks
 are necessary to parse the template in those cases.</p>
@@ -147,12 +138,12 @@ platforms, this has been a <a class="reference external" href="https://clang.llv
 dependent base class is a base class that depends on the value of a template
 parameter.  Clang cannot see any of the names inside dependent bases while it
 is parsing your template, so the user is sometimes required to use the
-<code class="docutils literal"><span class="pre">typename</span></code> keyword to assist the parser.  On Windows, Clang attempts to
+<code class="docutils literal notranslate"><span class="pre">typename</span></code> keyword to assist the parser.  On Windows, Clang attempts to
 follow the normal lookup rules, but if lookup fails, it will assume that the
 user intended to find the name in a dependent base.  While parsing the
 following program, Clang will recover as if the user had written the
 commented-out code:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
 <span class="k">struct</span> <span class="nl">Foo</span> <span class="p">:</span> <span class="n">T</span> <span class="p">{</span>
   <span class="kt">void</span> <span class="n">f</span><span class="p">()</span> <span class="p">{</span>
     <span class="cm">/*typename*/</span> <span class="n">T</span><span class="o">::</span><span class="n">UnknownType</span> <span class="n">x</span> <span class="o">=</span>  <span class="cm">/*this-&gt;*/</span><span class="n">unknownMember</span><span class="p">;</span>
@@ -184,7 +175,7 @@ apps, but they should be addressed soon.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>ASTImporter: Merging Clang ASTs &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="How To Setup Clang Tooling For LLVM" href="HowToSetupToolingForLLVM.html" />
     <link rel="prev" title="Matching the Clang AST" href="LibASTMatchers.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>ASTImporter: Merging Clang ASTs</span></h2>
@@ -48,8 +39,8 @@
         
   <div class="section" id="astimporter-merging-clang-asts">
 <h1>ASTImporter: Merging Clang ASTs<a class="headerlink" href="#astimporter-merging-clang-asts" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="docutils literal"><span class="pre">ASTImporter</span></code> class is part of Clang’s core library, the AST library.
-It imports nodes of an <code class="docutils literal"><span class="pre">ASTContext</span></code> into another <code class="docutils literal"><span class="pre">ASTContext</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ASTImporter</span></code> class is part of Clang’s core library, the AST library.
+It imports nodes of an <code class="docutils literal notranslate"><span class="pre">ASTContext</span></code> into another <code class="docutils literal notranslate"><span class="pre">ASTContext</span></code>.</p>
 <p>In this document, we assume basic knowledge about the Clang AST.  See the <a class="reference internal" href="IntroductionToTheClangAST.html"><span class="doc">Introduction
 to the Clang AST</span></a> if you want to learn more
 about how the AST is structured.
@@ -66,7 +57,7 @@ Knowledge about <a class="reference internal" href="LibASTMatchers.html"><span c
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#using-the-ast-merge-clang-front-end-action" id="id8">Using the <code class="docutils literal"><span class="pre">-ast-merge</span></code> Clang front-end action</a><ul>
+<li><a class="reference internal" href="#using-the-ast-merge-clang-front-end-action" id="id8">Using the <code class="docutils literal notranslate"><span class="pre">-ast-merge</span></code> Clang front-end action</a><ul>
 <li><a class="reference internal" href="#example-for-c" id="id9">Example for C</a></li>
 <li><a class="reference internal" href="#id1" id="id10">Example for C++</a></li>
 </ul>
@@ -75,31 +66,31 @@ Knowledge about <a class="reference internal" href="LibASTMatchers.html"><span c
 </div>
 <div class="section" id="introduction">
 <h2><a class="toc-backref" href="#id2">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal"><span class="pre">ASTContext</span></code> holds long-lived AST nodes (such as types and decls) that can be referred to throughout the semantic analysis of a file.
-In some cases it is preferable to work with more than one <code class="docutils literal"><span class="pre">ASTContext</span></code>.
+<p><code class="docutils literal notranslate"><span class="pre">ASTContext</span></code> holds long-lived AST nodes (such as types and decls) that can be referred to throughout the semantic analysis of a file.
+In some cases it is preferable to work with more than one <code class="docutils literal notranslate"><span class="pre">ASTContext</span></code>.
 For example, we’d like to parse multiple different files inside the same Clang tool.
 It may be convenient if we could view the set of the resulting ASTs as if they were one AST resulting from the parsing of each file together.
-<code class="docutils literal"><span class="pre">ASTImporter</span></code> provides the way to copy types or declarations from one <code class="docutils literal"><span class="pre">ASTContext</span></code> to another.
+<code class="docutils literal notranslate"><span class="pre">ASTImporter</span></code> provides the way to copy types or declarations from one <code class="docutils literal notranslate"><span class="pre">ASTContext</span></code> to another.
 We refer to the context from which we import as the <strong>“from” context</strong> or <em>source context</em>; and the context into which we import as the <strong>“to” context</strong> or <em>destination context</em>.</p>
-<p>Existing clients of the <code class="docutils literal"><span class="pre">ASTImporter</span></code> library are Cross Translation Unit (CTU) static analysis and the LLDB expression parser.
+<p>Existing clients of the <code class="docutils literal notranslate"><span class="pre">ASTImporter</span></code> library are Cross Translation Unit (CTU) static analysis and the LLDB expression parser.
 CTU static analysis imports a definition of a function if its definition is found in another translation unit (TU).
 This way the analysis can breach out from the single TU limitation.
-LLDB’s <code class="docutils literal"><span class="pre">expr</span></code> command parses a user-defined expression, creates an <code class="docutils literal"><span class="pre">ASTContext</span></code> for that and then imports the missing definitions from the AST what we got from the debug information (DWARF, etc).</p>
+LLDB’s <code class="docutils literal notranslate"><span class="pre">expr</span></code> command parses a user-defined expression, creates an <code class="docutils literal notranslate"><span class="pre">ASTContext</span></code> for that and then imports the missing definitions from the AST what we got from the debug information (DWARF, etc).</p>
 </div>
 <div class="section" id="algorithm-of-the-import">
 <h2><a class="toc-backref" href="#id3">Algorithm of the import</a><a class="headerlink" href="#algorithm-of-the-import" title="Permalink to this headline">¶</a></h2>
-<p>Importing one AST node copies that node into the destination <code class="docutils literal"><span class="pre">ASTContext</span></code>.
+<p>Importing one AST node copies that node into the destination <code class="docutils literal notranslate"><span class="pre">ASTContext</span></code>.
 Why do we have to copy the node?
 Isn’t enough to insert the pointer to that node into the destination context?
 One reason is that the “from” context may outlive the “to” context.
 Also, the Clang AST consider nodes (or certain properties of nodes) equivalent if they have the same address!</p>
 <p>The import algorithm has to ensure that the structurally equivalent nodes in the different translation units are not getting duplicated in the merged AST.
-E.g. if we include the definition of the vector template (<code class="docutils literal"><span class="pre">#include</span> <span class="pre">&lt;vector&gt;</span></code>) in two translation units, then their merged AST should have only one node which represents the template.
+E.g. if we include the definition of the vector template (<code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;vector&gt;</span></code>) in two translation units, then their merged AST should have only one node which represents the template.
 Also, we have to discover <em>one definition rule</em> (ODR) violations.
 For instance, if there is a class definition with the same name in both translation units, but one of the definition contains a different number of fields.
 So, we look up existing definitions, and then we check the structural equivalency on those nodes.
 The following pseudo-code demonstrates the basics of the import mechanism:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="c1">// Pseudo-code(!) of import:</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Pseudo-code(!) of import:</span>
 <span class="n">ErrorOrDecl</span> <span class="nf">Import</span><span class="p">(</span><span class="n">Decl</span> <span class="o">*</span><span class="n">FromD</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">Decl</span> <span class="o">*</span><span class="n">ToDecl</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
   <span class="n">FoundDeclsList</span> <span class="o">=</span> <span class="n">Look</span> <span class="n">up</span> <span class="n">all</span> <span class="n">Decls</span> <span class="n">in</span> <span class="n">the</span> <span class="s">&quot;to&quot;</span> <span class="n">Ctx</span> <span class="n">with</span> <span class="n">the</span> <span class="n">same</span> <span class="n">name</span> <span class="n">of</span> <span class="n">FromD</span><span class="p">;</span>
@@ -124,7 +115,7 @@ The following pseudo-code demonstrates the basics of the import mechanism:</p>
 </div>
 <p>Two AST nodes are <em>structurally equivalent</em> if they are</p>
 <ul class="simple">
-<li>builtin types and refer to the same type, e.g. <code class="docutils literal"><span class="pre">int</span></code> and <code class="docutils literal"><span class="pre">int</span></code> are structurally equivalent,</li>
+<li>builtin types and refer to the same type, e.g. <code class="docutils literal notranslate"><span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">int</span></code> are structurally equivalent,</li>
 <li>function types and all their parameters have structurally equivalent types,</li>
 <li>record types and all their fields in order of their definition have the same identifier names and structurally equivalent types,</li>
 <li>variable or function declarations and they have the same identifier name and their types are structurally equivalent.</li>
@@ -139,7 +130,7 @@ In this document, with the “dependent” adjective we always address the depen
 <h2><a class="toc-backref" href="#id4">API</a><a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a tool which uses the ASTImporter class!
 First, we build two ASTs from virtual files; the content of the virtual files are synthesized from string literals:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">ASTUnit</span><span class="o">&gt;</span> <span class="n">ToUnit</span> <span class="o">=</span> <span class="n">buildASTFromCode</span><span class="p">(</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">ASTUnit</span><span class="o">&gt;</span> <span class="n">ToUnit</span> <span class="o">=</span> <span class="n">buildASTFromCode</span><span class="p">(</span>
     <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;to.cc&quot;</span><span class="p">);</span> <span class="c1">// empty file</span>
 <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">ASTUnit</span><span class="o">&gt;</span> <span class="n">FromUnit</span> <span class="o">=</span> <span class="n">buildASTFromCode</span><span class="p">(</span>
     <span class="sa">R</span><span class="s">&quot;</span><span class="dl">(</span><span class="s"></span>
@@ -152,21 +143,21 @@ First, we build two ASTs from virtual files; the content of the virtual files ar
 </pre></div>
 </div>
 <p>The first AST corresponds to the destination (“to”) context - which is empty - and the second for the source (“from”) context.
-Next, we define a matcher to match <code class="docutils literal"><span class="pre">MyClass</span></code> in the “from” context:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">Matcher</span> <span class="o">=</span> <span class="n">cxxRecordDecl</span><span class="p">(</span><span class="n">hasName</span><span class="p">(</span><span class="s">&quot;MyClass&quot;</span><span class="p">));</span>
+Next, we define a matcher to match <code class="docutils literal notranslate"><span class="pre">MyClass</span></code> in the “from” context:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">Matcher</span> <span class="o">=</span> <span class="n">cxxRecordDecl</span><span class="p">(</span><span class="n">hasName</span><span class="p">(</span><span class="s">&quot;MyClass&quot;</span><span class="p">));</span>
 <span class="k">auto</span> <span class="o">*</span><span class="n">From</span> <span class="o">=</span> <span class="n">getFirstDecl</span><span class="o">&lt;</span><span class="n">CXXRecordDecl</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Matcher</span><span class="p">,</span> <span class="n">FromUnit</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Now we create the Importer and do the import:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">ASTImporter</span> <span class="nf">Importer</span><span class="p">(</span><span class="n">ToUnit</span><span class="o">-&gt;</span><span class="n">getASTContext</span><span class="p">(),</span> <span class="n">ToUnit</span><span class="o">-&gt;</span><span class="n">getFileManager</span><span class="p">(),</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">ASTImporter</span> <span class="nf">Importer</span><span class="p">(</span><span class="n">ToUnit</span><span class="o">-&gt;</span><span class="n">getASTContext</span><span class="p">(),</span> <span class="n">ToUnit</span><span class="o">-&gt;</span><span class="n">getFileManager</span><span class="p">(),</span>
                      <span class="n">FromUnit</span><span class="o">-&gt;</span><span class="n">getASTContext</span><span class="p">(),</span> <span class="n">FromUnit</span><span class="o">-&gt;</span><span class="n">getFileManager</span><span class="p">(),</span>
                      <span class="cm">/*MinimalImport=*/</span><span class="nb">true</span><span class="p">);</span>
 <span class="n">llvm</span><span class="o">::</span><span class="n">Expected</span><span class="o">&lt;</span><span class="n">Decl</span> <span class="o">*&gt;</span> <span class="n">ImportedOrErr</span> <span class="o">=</span> <span class="n">Importer</span><span class="p">.</span><span class="n">Import</span><span class="p">(</span><span class="n">From</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">Import</span></code> call returns with <code class="docutils literal"><span class="pre">llvm::Expected</span></code>, so, we must check for any error.
+<p>The <code class="docutils literal notranslate"><span class="pre">Import</span></code> call returns with <code class="docutils literal notranslate"><span class="pre">llvm::Expected</span></code>, so, we must check for any error.
 Please refer to the <a class="reference external" href="http://llvm.org/docs/ProgrammersManual.html#recoverable-errors">error handling</a> documentation for details.</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ImportedOrErr</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ImportedOrErr</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">llvm</span><span class="o">::</span><span class="n">Error</span> <span class="n">Err</span> <span class="o">=</span> <span class="n">ImportedOrErr</span><span class="p">.</span><span class="n">takeError</span><span class="p">();</span>
   <span class="n">llvm</span><span class="o">::</span><span class="n">errs</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;ERROR: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">Err</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
   <span class="n">consumeError</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">Err</span><span class="p">));</span>
@@ -176,12 +167,12 @@ Please refer to the <a class="reference external" href="http://llvm.org/docs/Pro
 </div>
 <p>If there’s no error then we can get the underlying value.
 In this example we will print the AST of the “to” context.</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">Decl</span> <span class="o">*</span><span class="n">Imported</span> <span class="o">=</span> <span class="o">*</span><span class="n">ImportedOrErr</span><span class="p">;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Decl</span> <span class="o">*</span><span class="n">Imported</span> <span class="o">=</span> <span class="o">*</span><span class="n">ImportedOrErr</span><span class="p">;</span>
 <span class="n">Imported</span><span class="o">-&gt;</span><span class="n">getTranslationUnitDecl</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">dump</span><span class="p">();</span>
 </pre></div>
 </div>
 <p>Since we set <strong>minimal import</strong> in the constructor of the importer, the AST will not contain the declaration of the members (once we run the test tool).</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>TranslationUnitDecl 0x68b9a8 <span class="s">&lt;&lt;invalid sloc&gt;&gt; &lt;invalid</span> sloc&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>TranslationUnitDecl 0x68b9a8 <span class="s">&lt;&lt;invalid sloc&gt;&gt; &lt;invalid</span> sloc&gt;
 <span class="sb">`</span>-CXXRecordDecl 0x6c7e30 &lt;line:2:7, col:13&gt; col:13 class MyClass definition
   <span class="sb">`</span>-DefinitionData pass_in_registers standard_layout trivially_copyable trivial literal
     <span class="p">|</span>-DefaultConstructor exists trivial needs_implicit
@@ -192,9 +183,9 @@ In this example we will print the AST of the “to” context.</p>
     <span class="sb">`</span>-Destructor simple irrelevant trivial needs_implicit
 </pre></div>
 </div>
-<p>We’d like to get the members too, so, we use <code class="docutils literal"><span class="pre">ImportDefinition</span></code> to copy the whole definition of <code class="docutils literal"><span class="pre">MyClass</span></code> into the “to” context.
+<p>We’d like to get the members too, so, we use <code class="docutils literal notranslate"><span class="pre">ImportDefinition</span></code> to copy the whole definition of <code class="docutils literal notranslate"><span class="pre">MyClass</span></code> into the “to” context.
 Then we dump the AST again.</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">llvm</span><span class="o">::</span><span class="n">Error</span> <span class="n">Err</span> <span class="o">=</span> <span class="n">Importer</span><span class="p">.</span><span class="n">ImportDefinition</span><span class="p">(</span><span class="n">From</span><span class="p">))</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">llvm</span><span class="o">::</span><span class="n">Error</span> <span class="n">Err</span> <span class="o">=</span> <span class="n">Importer</span><span class="p">.</span><span class="n">ImportDefinition</span><span class="p">(</span><span class="n">From</span><span class="p">))</span> <span class="p">{</span>
   <span class="n">llvm</span><span class="o">::</span><span class="n">errs</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;ERROR: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">Err</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
   <span class="n">consumeError</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">Err</span><span class="p">));</span>
   <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
@@ -204,7 +195,7 @@ Then we dump the AST again.</p>
 </pre></div>
 </div>
 <p>This time the AST is going to contain the members too.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>TranslationUnitDecl 0x68b9a8 <span class="s">&lt;&lt;invalid sloc&gt;&gt; &lt;invalid</span> sloc&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>TranslationUnitDecl 0x68b9a8 <span class="s">&lt;&lt;invalid sloc&gt;&gt; &lt;invalid</span> sloc&gt;
 <span class="sb">`</span>-CXXRecordDecl 0x6c7e30 &lt;line:2:7, col:13&gt; col:13 class MyClass definition
   <span class="p">|</span>-DefinitionData pass_in_registers standard_layout trivially_copyable trivial literal
   <span class="p">|</span> <span class="p">|</span>-DefaultConstructor exists trivial needs_implicit
@@ -218,14 +209,14 @@ Then we dump the AST again.</p>
   <span class="sb">`</span>-FieldDecl 0x6c8058 &lt;line:4:9, col:13&gt; col:13 m2 <span class="s1">&#39;int&#39;</span>
 </pre></div>
 </div>
-<p>We can spare the call for <code class="docutils literal"><span class="pre">ImportDefinition</span></code> if we set up the importer to do a “normal” (not minimal) import.</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">ASTImporter</span> <span class="nf">Importer</span><span class="p">(</span> <span class="p">....</span>  <span class="cm">/*MinimalImport=*/</span><span class="nb">false</span><span class="p">);</span>
+<p>We can spare the call for <code class="docutils literal notranslate"><span class="pre">ImportDefinition</span></code> if we set up the importer to do a “normal” (not minimal) import.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">ASTImporter</span> <span class="nf">Importer</span><span class="p">(</span> <span class="p">....</span>  <span class="cm">/*MinimalImport=*/</span><span class="nb">false</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>With <strong>normal import</strong>, all dependent declarations are imported normally.
 However, with minimal import, the dependent Decls are imported without definition, and we have to import their definition for each if we later need that.</p>
 <p>Putting this all together here is how the source of the tool looks like:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;clang/AST/ASTImporter.h&quot;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;clang/AST/ASTImporter.h&quot;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&quot;clang/ASTMatchers/ASTMatchFinder.h&quot;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&quot;clang/ASTMatchers/ASTMatchers.h&quot;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&quot;clang/Tooling/Tooling.h&quot;</span><span class="cp"></span>
@@ -286,8 +277,8 @@ However, with minimal import, the dependent Decls are imported without definitio
 <span class="p">};</span>
 </pre></div>
 </div>
-<p>We may extend the <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> under let’s say <code class="docutils literal"><span class="pre">clang/tools</span></code> with the build and link instructions:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>add_clang_executable<span class="o">(</span>astimporter-demo ASTImporterDemo.cpp<span class="o">)</span>
+<p>We may extend the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> under let’s say <code class="docutils literal notranslate"><span class="pre">clang/tools</span></code> with the build and link instructions:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>add_clang_executable<span class="o">(</span>astimporter-demo ASTImporterDemo.cpp<span class="o">)</span>
 clang_target_link_libraries<span class="o">(</span>astimporter-demo
   PRIVATE
   LLVMSupport
@@ -301,7 +292,7 @@ clang_target_link_libraries<span class="o">(</span>astimporter-demo
 </pre></div>
 </div>
 <p>Then we can build and execute the new tool.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ ninja astimporter-demo <span class="o">&amp;&amp;</span> ./bin/astimporter-demo
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ninja astimporter-demo <span class="o">&amp;&amp;</span> ./bin/astimporter-demo
 </pre></div>
 </div>
 <div class="section" id="errors-during-the-import-process">
@@ -309,8 +300,8 @@ clang_target_link_libraries<span class="o">(</span>astimporter-demo
 <p>Normally, either the source or the destination context contains the definition of a declaration.
 However, there may be cases when both of the contexts have a definition for a given symbol.
 If these definitions differ, then we have a name conflict, in C++ it is known as ODR (one definition rule) violation.
-Let’s modify the previous tool we had written and try to import a <code class="docutils literal"><span class="pre">ClassTemplateSpecializationDecl</span></code> with a conflicting definition:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+Let’s modify the previous tool we had written and try to import a <code class="docutils literal notranslate"><span class="pre">ClassTemplateSpecializationDecl</span></code> with a conflicting definition:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
   <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">ASTUnit</span><span class="o">&gt;</span> <span class="n">ToUnit</span> <span class="o">=</span> <span class="n">buildASTFromCode</span><span class="p">(</span>
       <span class="sa">R</span><span class="s">&quot;</span><span class="dl">(</span><span class="s"></span>
 <span class="s">      // primary template</span>
@@ -354,7 +345,7 @@ Let’s modify the previous tool we had written and try to import a <code class=
 </pre></div>
 </div>
 <p>When we run the tool we have the following warning:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>to.cc:7:14: warning: <span class="nb">type</span> <span class="s1">&#39;X&lt;int&gt;&#39;</span> has incompatible definitions in different translation units <span class="o">[</span>-Wodr<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>to.cc:7:14: warning: <span class="nb">type</span> <span class="s1">&#39;X&lt;int&gt;&#39;</span> has incompatible definitions in different translation units <span class="o">[</span>-Wodr<span class="o">]</span>
       struct X&lt;int&gt; <span class="o">{</span> int i<span class="p">;</span> <span class="o">}</span><span class="p">;</span>
              ^
 to.cc:7:27: note: field has name <span class="s1">&#39;i&#39;</span> here
@@ -365,10 +356,10 @@ from.cc:7:27: note: field has name <span class="s1">&#39;i2&#39;</span> here
                         ^
 </pre></div>
 </div>
-<p>Note, because of these diagnostics we had to call <code class="docutils literal"><span class="pre">enableSourceFileDiagnostics</span></code> on the <code class="docutils literal"><span class="pre">ASTUnit</span></code> objects.</p>
-<p>Since we could not import the specified declaration (<code class="docutils literal"><span class="pre">From</span></code>), we get an error in the return value.
+<p>Note, because of these diagnostics we had to call <code class="docutils literal notranslate"><span class="pre">enableSourceFileDiagnostics</span></code> on the <code class="docutils literal notranslate"><span class="pre">ASTUnit</span></code> objects.</p>
+<p>Since we could not import the specified declaration (<code class="docutils literal notranslate"><span class="pre">From</span></code>), we get an error in the return value.
 The AST does not contain the conflicting definition, so we are left with the original AST.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>ERROR: NameConflict
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ERROR: NameConflict
 TranslationUnitDecl 0xe54a48 <span class="s">&lt;&lt;invalid sloc&gt;&gt; &lt;invalid</span> sloc&gt;
 <span class="p">|</span>-ClassTemplateDecl 0xe91020 &lt;to.cc:3:7, line:4:17&gt; col:14 X
 <span class="p">|</span> <span class="p">|</span>-TemplateTypeParmDecl 0xe90ed0 &lt;line:3:17, col:26&gt; col:26 typename depth <span class="m">0</span> index <span class="m">0</span> T
@@ -398,13 +389,13 @@ TranslationUnitDecl 0xe54a48 <span class="s">&lt;&lt;invalid sloc&gt;&gt; &lt;in
 <div class="section" id="error-propagation">
 <h4><a class="toc-backref" href="#id6">Error propagation</a><a class="headerlink" href="#error-propagation" title="Permalink to this headline">¶</a></h4>
 <p>If there is a dependent node we have to import before we could import a given node then the import error associated to the dependency propagates to the dependant node.
-Let’s modify the previous example and import a <code class="docutils literal"><span class="pre">FieldDecl</span></code> instead of the <code class="docutils literal"><span class="pre">ClassTemplateSpecializationDecl</span></code>.</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">Matcher</span> <span class="o">=</span> <span class="n">fieldDecl</span><span class="p">(</span><span class="n">hasName</span><span class="p">(</span><span class="s">&quot;i2&quot;</span><span class="p">));</span>
+Let’s modify the previous example and import a <code class="docutils literal notranslate"><span class="pre">FieldDecl</span></code> instead of the <code class="docutils literal notranslate"><span class="pre">ClassTemplateSpecializationDecl</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">Matcher</span> <span class="o">=</span> <span class="n">fieldDecl</span><span class="p">(</span><span class="n">hasName</span><span class="p">(</span><span class="s">&quot;i2&quot;</span><span class="p">));</span>
 <span class="k">auto</span> <span class="o">*</span><span class="n">From</span> <span class="o">=</span> <span class="n">getFirstDecl</span><span class="o">&lt;</span><span class="n">FieldDecl</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Matcher</span><span class="p">,</span> <span class="n">FromUnit</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In this case we can see that an error is associated (<code class="docutils literal"><span class="pre">getImportDeclErrorIfAny</span></code>) to the specialization also, not just to the field:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">llvm</span><span class="o">::</span><span class="n">Expected</span><span class="o">&lt;</span><span class="n">Decl</span> <span class="o">*&gt;</span> <span class="n">ImportedOrErr</span> <span class="o">=</span> <span class="n">Importer</span><span class="p">.</span><span class="n">Import</span><span class="p">(</span><span class="n">From</span><span class="p">);</span>
+<p>In this case we can see that an error is associated (<code class="docutils literal notranslate"><span class="pre">getImportDeclErrorIfAny</span></code>) to the specialization also, not just to the field:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">llvm</span><span class="o">::</span><span class="n">Expected</span><span class="o">&lt;</span><span class="n">Decl</span> <span class="o">*&gt;</span> <span class="n">ImportedOrErr</span> <span class="o">=</span> <span class="n">Importer</span><span class="p">.</span><span class="n">Import</span><span class="p">(</span><span class="n">From</span><span class="p">);</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ImportedOrErr</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">llvm</span><span class="o">::</span><span class="n">Error</span> <span class="n">Err</span> <span class="o">=</span> <span class="n">ImportedOrErr</span><span class="p">.</span><span class="n">takeError</span><span class="p">();</span>
   <span class="n">consumeError</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">Err</span><span class="p">));</span>
@@ -425,10 +416,10 @@ Let’s modify the previous example and import a <code class="docutils literal">
 <h4><a class="toc-backref" href="#id7">Polluted AST</a><a class="headerlink" href="#polluted-ast" title="Permalink to this headline">¶</a></h4>
 <p>We may recognize an error during the import of a dependent node. However, by that time, we had already created the dependant.
 In these cases we do not remove the existing erroneous node from the “to” context, rather we associate an error to that node.
-Let’s extend the previous example with another class <code class="docutils literal"><span class="pre">Y</span></code>.
+Let’s extend the previous example with another class <code class="docutils literal notranslate"><span class="pre">Y</span></code>.
 This class has a forward definition in the “to” context, but its definition is in the “from” context.
 We’d like to import the definition, but it contains a member whose type conflicts with the type in the “to” context:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">ASTUnit</span><span class="o">&gt;</span> <span class="n">ToUnit</span> <span class="o">=</span> <span class="n">buildASTFromCode</span><span class="p">(</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">ASTUnit</span><span class="o">&gt;</span> <span class="n">ToUnit</span> <span class="o">=</span> <span class="n">buildASTFromCode</span><span class="p">(</span>
     <span class="sa">R</span><span class="s">&quot;</span><span class="dl">(</span><span class="s"></span>
 <span class="s">    // primary template</span>
 <span class="s">    template &lt;typename T&gt;</span>
@@ -460,10 +451,10 @@ We’d like to import the definition, but it contains a member whose type confli
 <span class="k">auto</span> <span class="o">*</span><span class="n">To</span> <span class="o">=</span> <span class="n">getFirstDecl</span><span class="o">&lt;</span><span class="n">CXXRecordDecl</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Matcher</span><span class="p">,</span> <span class="n">ToUnit</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>This time we create a shared_ptr for <code class="docutils literal"><span class="pre">ASTImporterSharedState</span></code> which owns the associated errors for the “to” context.
-Note, there may be several different ASTImporter objects which import into the same “to” context but from different “from” contexts; they should share the same <code class="docutils literal"><span class="pre">ASTImporterSharedState</span></code>.
-(Also note, we have to include the corresponding <code class="docutils literal"><span class="pre">ASTImporterSharedState.h</span></code> header file.)</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">ImporterState</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">ASTImporterSharedState</span><span class="o">&gt;</span><span class="p">();</span>
+<p>This time we create a shared_ptr for <code class="docutils literal notranslate"><span class="pre">ASTImporterSharedState</span></code> which owns the associated errors for the “to” context.
+Note, there may be several different ASTImporter objects which import into the same “to” context but from different “from” contexts; they should share the same <code class="docutils literal notranslate"><span class="pre">ASTImporterSharedState</span></code>.
+(Also note, we have to include the corresponding <code class="docutils literal notranslate"><span class="pre">ASTImporterSharedState.h</span></code> header file.)</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">ImporterState</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">ASTImporterSharedState</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="n">ASTImporter</span> <span class="nf">Importer</span><span class="p">(</span><span class="n">ToUnit</span><span class="o">-&gt;</span><span class="n">getASTContext</span><span class="p">(),</span> <span class="n">ToUnit</span><span class="o">-&gt;</span><span class="n">getFileManager</span><span class="p">(),</span>
                      <span class="n">FromUnit</span><span class="o">-&gt;</span><span class="n">getASTContext</span><span class="p">(),</span> <span class="n">FromUnit</span><span class="o">-&gt;</span><span class="n">getFileManager</span><span class="p">(),</span>
                      <span class="cm">/*MinimalImport=*/</span><span class="nb">false</span><span class="p">,</span> <span class="n">ImporterState</span><span class="p">);</span>
@@ -486,7 +477,7 @@ Note, there may be several different ASTImporter objects which import into the s
 </pre></div>
 </div>
 <p>If we take a look at the AST, then we can see that the Decl with the definition is created, but the field is missing.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="p">|</span>-CXXRecordDecl 0xf66678 &lt;line:9:7, col:13&gt; col:13 class Y
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="p">|</span>-CXXRecordDecl 0xf66678 &lt;line:9:7, col:13&gt; col:13 class Y
 <span class="sb">`</span>-CXXRecordDecl 0xf66730 prev 0xf66678 &lt;:10:7, col:13&gt; col:13 class Y definition
   <span class="p">|</span>-DefinitionData pass_in_registers empty aggregate standard_layout trivially_copyable pod trivial literal has_constexpr_non_copy_move_ctor can_const_default_init
   <span class="p">|</span> <span class="p">|</span>-DefaultConstructor exists trivial constexpr needs_implicit defaulted_is_constexpr
@@ -506,16 +497,16 @@ We recommend skipping the processing of those nodes which have an error associat
 </div>
 </div>
 <div class="section" id="using-the-ast-merge-clang-front-end-action">
-<h2><a class="toc-backref" href="#id8">Using the <code class="docutils literal"><span class="pre">-ast-merge</span></code> Clang front-end action</a><a class="headerlink" href="#using-the-ast-merge-clang-front-end-action" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal"><span class="pre">-ast-merge</span> <span class="pre">&lt;pch-file&gt;</span></code> command-line switch can be used to merge from the given serialized AST file.
+<h2><a class="toc-backref" href="#id8">Using the <code class="docutils literal notranslate"><span class="pre">-ast-merge</span></code> Clang front-end action</a><a class="headerlink" href="#using-the-ast-merge-clang-front-end-action" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">-ast-merge</span> <span class="pre">&lt;pch-file&gt;</span></code> command-line switch can be used to merge from the given serialized AST file.
 This file represents the source context.
 When this switch is present then each top-level AST node of the source context is being merged into the destination context.
-If the merge was successful then <code class="docutils literal"><span class="pre">ASTConsumer::HandleTopLevelDecl</span></code> is called for the Decl.
+If the merge was successful then <code class="docutils literal notranslate"><span class="pre">ASTConsumer::HandleTopLevelDecl</span></code> is called for the Decl.
 This results that we can execute the original front-end action on the extended AST.</p>
 <div class="section" id="example-for-c">
 <h3><a class="toc-backref" href="#id9">Example for C</a><a class="headerlink" href="#example-for-c" title="Permalink to this headline">¶</a></h3>
 <p>Let’s consider the following three files:</p>
-<div class="highlight-c"><div class="highlight"><pre><span></span><span class="c1">// bar.h</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// bar.h</span>
 <span class="cp">#ifndef BAR_H</span>
 <span class="cp">#define BAR_H</span>
 <span class="kt">int</span> <span class="nf">bar</span><span class="p">();</span>
@@ -535,12 +526,12 @@ This results that we can execute the original front-end action on the extended A
 </pre></div>
 </div>
 <p>Let’s generate the AST files for the two source files:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ clang -cc1 -emit-pch -o bar.ast bar.c
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ clang -cc1 -emit-pch -o bar.ast bar.c
 $ clang -cc1 -emit-pch -o main.ast main.c
 </pre></div>
 </div>
-<p>Then, let’s check how the merged AST would look like if we consider only the <code class="docutils literal"><span class="pre">bar()</span></code> function:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ clang -cc1 -ast-merge bar.ast -ast-merge main.ast /dev/null -ast-dump
+<p>Then, let’s check how the merged AST would look like if we consider only the <code class="docutils literal notranslate"><span class="pre">bar()</span></code> function:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ clang -cc1 -ast-merge bar.ast -ast-merge main.ast /dev/null -ast-dump
 TranslationUnitDecl 0x12b0738 <span class="s">&lt;&lt;invalid sloc&gt;&gt; &lt;invalid</span> sloc&gt;
 <span class="p">|</span>-FunctionDecl 0x12b1470 &lt;/path/bar.h:4:1, col:9&gt; col:5 used bar <span class="s1">&#39;int ()&#39;</span>
 <span class="p">|</span>-FunctionDecl 0x12b1538 prev 0x12b1470 &lt;/path/bar.c:3:1, line:5:1&gt; line:3:5 used bar <span class="s1">&#39;int ()&#39;</span>
@@ -553,13 +544,13 @@ TranslationUnitDecl 0x12b0738 <span class="s">&lt;&lt;invalid sloc&gt;&gt; &lt;i
 <p>We can inspect that the prototype of the function and the definition of it is merged into the same redeclaration chain.
 What’s more there is a third prototype declaration merged to the chain.
 The functions are merged in a way that prototypes are added to the redecl chain if they refer to the same type, but we can have only one definition.
-The first two declarations are from <code class="docutils literal"><span class="pre">bar.ast</span></code>, the third is from <code class="docutils literal"><span class="pre">main.ast</span></code>.</p>
+The first two declarations are from <code class="docutils literal notranslate"><span class="pre">bar.ast</span></code>, the third is from <code class="docutils literal notranslate"><span class="pre">main.ast</span></code>.</p>
 <p>Now, let’s create an object file from the merged AST:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ clang -cc1 -ast-merge bar.ast -ast-merge main.ast /dev/null -emit-obj -o main.o
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ clang -cc1 -ast-merge bar.ast -ast-merge main.ast /dev/null -emit-obj -o main.o
 </pre></div>
 </div>
 <p>Next, we may call the linker and execute the created binary file.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ clang -o a.out main.o
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ clang -o a.out main.o
 $ ./a.out
 $ <span class="nb">echo</span> <span class="nv">$?</span>
 <span class="m">41</span>
@@ -571,7 +562,7 @@ $
 <h3><a class="toc-backref" href="#id10">Example for C++</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>In the case of C++, the generation of the AST files and the way how we invoke the front-end is a bit different.
 Assuming we have these three files:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="c1">// foo.h</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// foo.h</span>
 <span class="cp">#ifndef FOO_H</span>
 <span class="cp">#define FOO_H</span>
 <span class="k">struct</span> <span class="n">foo</span> <span class="p">{</span>
@@ -593,7 +584,7 @@ Assuming we have these three files:</p>
 </pre></div>
 </div>
 <p>We shall generate the AST files, merge them, create the executable and then run it:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ clang++ -x c++-header -o foo.ast foo.cpp
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ clang++ -x c++-header -o foo.ast foo.cpp
 $ clang++ -x c++-header -o main.ast main.cpp
 $ clang++ -cc1 -x c++ -ast-merge foo.ast -ast-merge main.ast /dev/null -ast-dump
 $ clang++ -cc1 -x c++ -ast-merge foo.ast -ast-merge main.ast /dev/null -emit-obj -o main.o
@@ -624,7 +615,7 @@ $
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

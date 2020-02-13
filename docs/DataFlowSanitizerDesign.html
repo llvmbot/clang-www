@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>DataFlowSanitizer Design Document &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="LeakSanitizer" href="LeakSanitizer.html" />
     <link rel="prev" title="DataFlowSanitizer" href="DataFlowSanitizer.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>DataFlowSanitizer Design Document</span></h2>
@@ -74,8 +65,8 @@ ensure it isn’t exiting the program anywhere it shouldn’t be.</p>
 <p>A number of functions are provided which will create taint labels,
 attach labels to memory regions and extract the set of labels
 associated with a specific memory region. These functions are declared
-in the header file <code class="docutils literal"><span class="pre">sanitizer/dfsan_interface.h</span></code>.</p>
-<div class="highlight-c"><div class="highlight"><pre><span></span><span class="c1">/// Creates and returns a base label with the given description and user data.</span>
+in the header file <code class="docutils literal notranslate"><span class="pre">sanitizer/dfsan_interface.h</span></code>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">/// Creates and returns a base label with the given description and user data.</span>
 <span class="n">dfsan_label</span> <span class="nf">dfsan_create_label</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">desc</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">userdata</span><span class="p">);</span>
 
 <span class="c1">/// Sets the label for each address in [addr,addr+size) to \c label.</span>
@@ -131,9 +122,9 @@ subsumes the other. If so, it returns the previously allocated union
 label. If not, it allocates a new union label from the same pool used
 for new labels.</p>
 <p>Specifically, the instrumentation pass will insert code like this
-to decide the union label <code class="docutils literal"><span class="pre">lu</span></code> for a pair of labels <code class="docutils literal"><span class="pre">l1</span></code>
-and <code class="docutils literal"><span class="pre">l2</span></code>:</p>
-<div class="highlight-c"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">l1</span> <span class="o">==</span> <span class="n">l2</span><span class="p">)</span>
+to decide the union label <code class="docutils literal notranslate"><span class="pre">lu</span></code> for a pair of labels <code class="docutils literal notranslate"><span class="pre">l1</span></code>
+and <code class="docutils literal notranslate"><span class="pre">l2</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">l1</span> <span class="o">==</span> <span class="n">l2</span><span class="p">)</span>
   <span class="n">lu</span> <span class="o">=</span> <span class="n">l1</span><span class="p">;</span>
 <span class="k">else</span>
   <span class="n">lu</span> <span class="o">=</span> <span class="n">__dfsan_union</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">);</span>
@@ -141,11 +132,11 @@ and <code class="docutils literal"><span class="pre">l2</span></code>:</p>
 </div>
 <p>The equality comparison is outlined, to provide an early exit in
 the common cases where the program is processing unlabelled data, or
-where the two data items have the same label.  <code class="docutils literal"><span class="pre">__dfsan_union</span></code> is
+where the two data items have the same label.  <code class="docutils literal notranslate"><span class="pre">__dfsan_union</span></code> is
 a runtime library function which performs all other union computation.</p>
-<p>Further optimizations are possible, for example if <code class="docutils literal"><span class="pre">l1</span></code> is known
+<p>Further optimizations are possible, for example if <code class="docutils literal notranslate"><span class="pre">l1</span></code> is known
 at compile time to be zero (e.g. it is derived from a constant),
-<code class="docutils literal"><span class="pre">l2</span></code> can be used for <code class="docutils literal"><span class="pre">lu</span></code>, and vice versa.</p>
+<code class="docutils literal notranslate"><span class="pre">l2</span></code> can be used for <code class="docutils literal notranslate"><span class="pre">lu</span></code>, and vice versa.</p>
 </div>
 <div class="section" id="memory-layout-and-label-management">
 <h2>Memory layout and label management<a class="headerlink" href="#memory-layout-and-label-management" title="Permalink to this headline">¶</a></h2>
@@ -203,7 +194,7 @@ There are currently two supported ABIs:</p>
 <li>Args – Argument and return value labels are passed through additional
 arguments and by modifying the return type.</li>
 <li>TLS – Argument and return value labels are passed through TLS variables
-<code class="docutils literal"><span class="pre">__dfsan_arg_tls</span></code> and <code class="docutils literal"><span class="pre">__dfsan_retval_tls</span></code>.</li>
+<code class="docutils literal notranslate"><span class="pre">__dfsan_arg_tls</span></code> and <code class="docutils literal notranslate"><span class="pre">__dfsan_retval_tls</span></code>.</li>
 </ul>
 <p>The main advantage of the TLS ABI is that it is more tolerant of ABI mismatches
 (TLS storage is not shared with any other form of storage, whereas extra
@@ -221,7 +212,7 @@ function with a reference to a function which uses the instrumented ABI.
 Such functions are automatically-generated wrappers for the native functions.
 For example, given the ABI list example provided in the user manual, the
 following wrappers will be generated under the args ABI:</p>
-<div class="highlight-llvm"><div class="highlight"><pre><span></span><span class="k">define</span> <span class="k">linkonce_odr</span> <span class="p">{</span> <span class="k">i8</span><span class="p">*,</span> <span class="k">i16</span> <span class="p">}</span> <span class="vg">@&quot;dfsw$malloc&quot;</span><span class="p">(</span><span class="k">i64</span> <span class="nv nv-Anonymous">%0</span><span class="p">,</span> <span class="k">i16</span> <span class="nv nv-Anonymous">%1</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-llvm notranslate"><div class="highlight"><pre><span></span><span class="k">define</span> <span class="k">linkonce_odr</span> <span class="p">{</span> <span class="k">i8</span><span class="p">*,</span> <span class="k">i16</span> <span class="p">}</span> <span class="vg">@&quot;dfsw$malloc&quot;</span><span class="p">(</span><span class="k">i64</span> <span class="nv nv-Anonymous">%0</span><span class="p">,</span> <span class="k">i16</span> <span class="nv nv-Anonymous">%1</span><span class="p">)</span> <span class="p">{</span>
 <span class="nl">entry:</span>
   <span class="nv nv-Anonymous">%2</span> <span class="p">=</span> <span class="k">call</span> <span class="k">i8</span><span class="p">*</span> <span class="vg">@malloc</span><span class="p">(</span><span class="k">i64</span> <span class="nv nv-Anonymous">%0</span><span class="p">)</span>
   <span class="nv nv-Anonymous">%3</span> <span class="p">=</span> <span class="k">insertvalue</span> <span class="p">{</span> <span class="k">i8</span><span class="p">*,</span> <span class="k">i16</span> <span class="p">}</span> <span class="k">undef</span><span class="p">,</span> <span class="k">i8</span><span class="p">*</span> <span class="nv nv-Anonymous">%2</span><span class="p">,</span> <span class="m">0</span>
@@ -251,8 +242,8 @@ following wrappers will be generated under the args ABI:</p>
 <p>As an optimization, direct calls to native ABI functions will call the
 native ABI function directly and the pass will compute the appropriate label
 internally.  This has the advantage of reducing the number of union operations
-required when the return value label is known to be zero (i.e. <code class="docutils literal"><span class="pre">discard</span></code>
-functions, or <code class="docutils literal"><span class="pre">functional</span></code> functions with known unlabelled arguments).</p>
+required when the return value label is known to be zero (i.e. <code class="docutils literal notranslate"><span class="pre">discard</span></code>
+functions, or <code class="docutils literal notranslate"><span class="pre">functional</span></code> functions with known unlabelled arguments).</p>
 </div>
 <div class="section" id="checking-abi-consistency">
 <h2>Checking ABI Consistency<a class="headerlink" href="#checking-abi-consistency" title="Permalink to this headline">¶</a></h2>
@@ -283,7 +274,7 @@ These problems could potentially be caught dynamically.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

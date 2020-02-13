@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>ClangFormat &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Clang-Format Style Options" href="ClangFormatStyleOptions.html" />
     <link rel="prev" title="ClangCheck" href="ClangCheck.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>ClangFormat</span></h2>
@@ -55,7 +46,7 @@ standalone tool and editor integrations.</p>
 <h2>Standalone Tool<a class="headerlink" href="#standalone-tool" title="Permalink to this headline">¶</a></h2>
 <p><strong class="program">clang-format</strong> is located in <cite>clang/tools/clang-format</cite> and can be used
 to format C/C++/Java/JavaScript/Objective-C/Protobuf/C# code.</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> clang-format -help
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> clang-format -help
 <span class="go">OVERVIEW: A tool to format C/C++/Java/JavaScript/Objective-C/Protobuf/C# code.</span>
 
 <span class="go">If no arguments are specified, it formats the code from standard input</span>
@@ -128,11 +119,11 @@ to format C/C++/Java/JavaScript/Objective-C/Protobuf/C# code.</p>
 </pre></div>
 </div>
 <p>When the desired code formatting style is different from the available options,
-the style can be customized using the <code class="docutils literal"><span class="pre">-style=&quot;{key:</span> <span class="pre">value,</span> <span class="pre">...}&quot;</span></code> option or
-by putting your style configuration in the <code class="docutils literal"><span class="pre">.clang-format</span></code> or <code class="docutils literal"><span class="pre">_clang-format</span></code>
-file in your project’s directory and using <code class="docutils literal"><span class="pre">clang-format</span> <span class="pre">-style=file</span></code>.</p>
-<p>An easy way to create the <code class="docutils literal"><span class="pre">.clang-format</span></code> file is:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">clang-format -style=llvm -dump-config &gt; .clang-format</span>
+the style can be customized using the <code class="docutils literal notranslate"><span class="pre">-style=&quot;{key:</span> <span class="pre">value,</span> <span class="pre">...}&quot;</span></code> option or
+by putting your style configuration in the <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> or <code class="docutils literal notranslate"><span class="pre">_clang-format</span></code>
+file in your project’s directory and using <code class="docutils literal notranslate"><span class="pre">clang-format</span> <span class="pre">-style=file</span></code>.</p>
+<p>An easy way to create the <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> file is:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">clang-format -style=llvm -dump-config &gt; .clang-format</span>
 </pre></div>
 </div>
 <p>Available style options are described in <a class="reference internal" href="ClangFormatStyleOptions.html"><span class="doc">Clang-Format Style Options</span></a>.</p>
@@ -144,7 +135,7 @@ file in your project’s directory and using <code class="docutils literal"><spa
 selecting regions to reformat. The integration has the form of a <cite>python</cite>-file
 which can be found under <cite>clang/tools/clang-format/clang-format.py</cite>.</p>
 <p>This can be integrated by adding the following to your <cite>.vimrc</cite>:</p>
-<div class="highlight-vim"><div class="highlight"><pre><span></span>map <span class="p">&lt;</span>C<span class="p">-</span>K<span class="p">&gt;</span> :<span class="k">pyf</span> <span class="p">&lt;</span><span class="nb">path</span><span class="p">-</span><span class="k">to</span><span class="p">-</span>this<span class="p">-</span><span class="k">file</span><span class="p">&gt;</span>/clang<span class="p">-</span>format.<span class="k">py</span><span class="p">&lt;</span><span class="k">cr</span><span class="p">&gt;</span>
+<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span>map <span class="p">&lt;</span>C<span class="p">-</span>K<span class="p">&gt;</span> :<span class="k">pyf</span> <span class="p">&lt;</span><span class="nb">path</span><span class="p">-</span><span class="k">to</span><span class="p">-</span>this<span class="p">-</span><span class="k">file</span><span class="p">&gt;</span>/clang<span class="p">-</span>format.<span class="k">py</span><span class="p">&lt;</span><span class="k">cr</span><span class="p">&gt;</span>
 imap <span class="p">&lt;</span>C<span class="p">-</span>K<span class="p">&gt;</span> <span class="p">&lt;</span><span class="k">c</span><span class="p">-</span><span class="k">o</span><span class="p">&gt;</span>:<span class="k">pyf</span> <span class="p">&lt;</span><span class="nb">path</span><span class="p">-</span><span class="k">to</span><span class="p">-</span>this<span class="p">-</span><span class="k">file</span><span class="p">&gt;</span>/clang<span class="p">-</span>format.<span class="k">py</span><span class="p">&lt;</span><span class="k">cr</span><span class="p">&gt;</span>
 </pre></div>
 </div>
@@ -160,7 +151,7 @@ or save any files. To revert a formatting, just undo.</p>
 <p>An alternative option is to format changes when saving a file and thus to
 have a zero-effort integration into the coding workflow. To do this, add this to
 your <cite>.vimrc</cite>:</p>
-<div class="highlight-vim"><div class="highlight"><pre><span></span><span class="k">function</span><span class="p">!</span> Formatonsave<span class="p">()</span>
+<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="p">!</span> Formatonsave<span class="p">()</span>
   <span class="k">let</span> <span class="k">l</span>:formatdiff <span class="p">=</span> <span class="m">1</span>
   <span class="k">pyf</span> <span class="p">~</span><span class="sr">/llvm/</span>tools<span class="sr">/clang/</span>tools<span class="sr">/clang-format/</span>clang<span class="p">-</span>format.<span class="k">py</span>
 <span class="k">endfunction</span>
@@ -173,7 +164,7 @@ autocmd <span class="nb">BufWritePre</span> *.<span class="k">h</span><span clas
 <p>Similar to the integration for <strong class="program">vim</strong>, there is an integration for
 <strong class="program">emacs</strong>. It can be found at <cite>clang/tools/clang-format/clang-format.el</cite>
 and used by adding this to your <cite>.emacs</cite>:</p>
-<div class="highlight-common-lisp"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">load</span> <span class="s">&quot;&lt;path-to-clang&gt;/tools/clang-format/clang-format.el&quot;</span><span class="p">)</span>
+<div class="highlight-common-lisp notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="nb">load</span> <span class="s">&quot;&lt;path-to-clang&gt;/tools/clang-format/clang-format.el&quot;</span><span class="p">)</span>
 <span class="p">(</span><span class="nv">global-set-key</span> <span class="nv">[C-M-tab]</span> <span class="ss">&#39;clang-format-region</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -198,7 +189,7 @@ shortcut in the BBEdit preferences, under Menus &amp; Shortcuts.</p>
 can be turned on in Settings/Preferences | Editor | Code Style.</p>
 <p>If <strong class="program">clang-format</strong> support is enabled, CLion detects config files when
 opening a project and suggests overriding the current IDE settings. Code style
-rules from the <code class="docutils literal"><span class="pre">.clang-format</span></code> files are then applied automatically to all
+rules from the <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> files are then applied automatically to all
 editor actions, including auto-completion, code generation, and refactorings.</p>
 </div>
 <div class="section" id="visual-studio-integration">
@@ -210,7 +201,7 @@ editor actions, including auto-completion, code generation, and refactorings.</p
 <p>The python script <cite>clang/tools/clang-format/clang-format-diff.py</cite> parses the
 output of a unified diff and reformats all contained lines with
 <strong class="program">clang-format</strong>.</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">usage: clang-format-diff.py [-h] [-i] [-p NUM] [-regex PATTERN] [-style STYLE]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: clang-format-diff.py [-h] [-i] [-p NUM] [-regex PATTERN] [-style STYLE]</span>
 
 <span class="go">Reformat changed lines in diff. Without -i option just output the diff that</span>
 <span class="go">would be introduced.</span>
@@ -225,15 +216,15 @@ output of a unified diff and reformats all contained lines with
 </pre></div>
 </div>
 <p>So to reformat all the lines in the latest <strong class="program">git</strong> commit, just do:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">git diff -U0 --no-color HEAD^ | clang-format-diff.py -i -p1</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git diff -U0 --no-color HEAD^ | clang-format-diff.py -i -p1</span>
 </pre></div>
 </div>
 <p>With Mercurial/<strong class="program">hg</strong>:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">hg diff -U0 --color=never | clang-format-diff.py -i -p1</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">hg diff -U0 --color=never | clang-format-diff.py -i -p1</span>
 </pre></div>
 </div>
 <p>In an SVN client, you can do:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">svn diff --diff-cmd=diff -x -U0 | clang-format-diff.py -i</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">svn diff --diff-cmd=diff -x -U0 | clang-format-diff.py -i</span>
 </pre></div>
 </div>
 <p>The option <cite>-U0</cite> will create a diff without context lines (the script would format
@@ -257,7 +248,7 @@ those as well).</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

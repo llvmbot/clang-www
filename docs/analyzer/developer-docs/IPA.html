@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>3.2. Inlining &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="3.3. Initializer List" href="InitializerLists.html" />
     <link rel="prev" title="3.1. Debug Checks" href="DebugChecks.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>3.2. Inlining</span></h2>
@@ -49,19 +40,19 @@
   <div class="section" id="inlining">
 <h1>3.2. Inlining<a class="headerlink" href="#inlining" title="Permalink to this headline">¶</a></h1>
 <p>There are several options that control which calls the analyzer will consider for
-inlining. The major one is <code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">ipa</span></code>:</p>
+inlining. The major one is <code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">ipa</span></code>:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">analyzer-config</span> <span class="pre">ipa=none</span></code> - All inlining is disabled. This is the only mode
+<li><code class="docutils literal notranslate"><span class="pre">analyzer-config</span> <span class="pre">ipa=none</span></code> - All inlining is disabled. This is the only mode
 available in LLVM 3.1 and earlier and in Xcode 4.3 and earlier.</li>
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">analyzer-config</span> <span class="pre">ipa=basic-inlining</span></code> - Turns on inlining for C functions, C++</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">analyzer-config</span> <span class="pre">ipa=basic-inlining</span></code> - Turns on inlining for C functions, C++</dt>
 <dd>static member functions, and blocks – essentially, the calls that behave
 like simple C function calls. This is essentially the mode used in
 Xcode 4.4.</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">analyzer-config</span> <span class="pre">ipa=inlining</span></code> - Turns on inlining when we can confidently find</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">analyzer-config</span> <span class="pre">ipa=inlining</span></code> - Turns on inlining when we can confidently find</dt>
 <dd>the function/method body corresponding to the call. (C functions, static
 functions, devirtualized C++ methods, Objective-C class methods, Objective-C
 instance methods when ExprEngine is confident about the dynamic type of the
@@ -69,31 +60,31 @@ instance).</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">analyzer-config</span> <span class="pre">ipa=dynamic</span></code> - Inline instance methods for which the type is</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">analyzer-config</span> <span class="pre">ipa=dynamic</span></code> - Inline instance methods for which the type is</dt>
 <dd>determined at runtime and we are not 100% sure that our type info is
 correct. For virtual calls, inline the most plausible definition.</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">analyzer-config</span> <span class="pre">ipa=dynamic-bifurcate</span></code> - Same as -analyzer-config ipa=dynamic,</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">analyzer-config</span> <span class="pre">ipa=dynamic-bifurcate</span></code> - Same as -analyzer-config ipa=dynamic,</dt>
 <dd>but the path is split. We inline on one branch and do not inline on the
 other. This mode does not drop the coverage in cases when the parent class
 has code that is only exercised when some of its methods are overridden.</dd>
 </dl>
 </li>
 </ul>
-<p>Currently, <code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">ipa=dynamic-bifurcate</span></code> is the default mode.</p>
-<p>While <code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">ipa</span></code> determines in general how aggressively the analyzer
+<p>Currently, <code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">ipa=dynamic-bifurcate</span></code> is the default mode.</p>
+<p>While <code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">ipa</span></code> determines in general how aggressively the analyzer
 will try to inline functions, several additional options control which types of
 functions can inlined, in an all-or-nothing way. These options use the
 analyzer’s configuration table, so they are all specified as follows:</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">OPTION=VALUE</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">OPTION=VALUE</span></code></div></blockquote>
 <div class="section" id="c-inlining">
 <h2>3.2.1. c++-inlining<a class="headerlink" href="#c-inlining" title="Permalink to this headline">¶</a></h2>
 <p>This option controls which C++ member functions may be inlined.</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">c++-inlining=[none</span> <span class="pre">|</span> <span class="pre">methods</span> <span class="pre">|</span> <span class="pre">constructors</span> <span class="pre">|</span> <span class="pre">destructors]</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">c++-inlining=[none</span> <span class="pre">|</span> <span class="pre">methods</span> <span class="pre">|</span> <span class="pre">constructors</span> <span class="pre">|</span> <span class="pre">destructors]</span></code></div></blockquote>
 <p>Each of these modes implies that all the previous member function kinds will be
 inlined as well; it doesn’t make sense to inline destructors without inlining
 constructors, for example.</p>
@@ -108,7 +99,7 @@ regardless of the setting of the c++-inlining mode.</p>
 <h3>3.2.1.1. c++-template-inlining<a class="headerlink" href="#c-template-inlining" title="Permalink to this headline">¶</a></h3>
 <p>This option controls whether C++ templated functions may be inlined.</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">c++-template-inlining=[true</span> <span class="pre">|</span> <span class="pre">false]</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">c++-template-inlining=[true</span> <span class="pre">|</span> <span class="pre">false]</span></code></div></blockquote>
 <p>Currently, template functions are considered for inlining by default.</p>
 <p>The motivation behind this option is that very generic code can be a source
 of false positives, either by considering paths that the caller considers
@@ -121,7 +112,7 @@ of a deep implementation of a function.</p>
 methods of the container classes in the Standard Template Library, should be
 considered for inlining.</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">c++-stdlib-inlining=[true</span> <span class="pre">|</span> <span class="pre">false]</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">c++-stdlib-inlining=[true</span> <span class="pre">|</span> <span class="pre">false]</span></code></div></blockquote>
 <p>Currently, C++ standard library functions are considered for inlining by
 default.</p>
 <p>The standard library functions and the STL in particular are used ubiquitously
@@ -135,7 +126,7 @@ to silence analyzer warnings.</p>
 <p>This option controls whether constructors and destructors of “container” types
 should be considered for inlining.</p>
 <blockquote>
-<div><code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">c++-container-inlining=[true</span> <span class="pre">|</span> <span class="pre">false]</span></code></div></blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">c++-container-inlining=[true</span> <span class="pre">|</span> <span class="pre">false]</span></code></div></blockquote>
 <p>Currently, these constructors and destructors are NOT considered for inlining
 by default.</p>
 <p>The current implementation of this setting checks whether a type has a member
@@ -143,7 +134,7 @@ named ‘iterator’ or a member named ‘begin’; these names are idiomatic in
 with the latter specified in the C++11 standard. The analyzer currently does a
 fairly poor job of modeling certain data structure invariants of container-like
 objects. For example, these three expressions should be equivalent:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">distance</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">c</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">distance</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">c</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
 <span class="n">c</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span> <span class="o">==</span> <span class="n">c</span><span class="p">.</span><span class="n">end</span><span class="p">()</span>
 <span class="n">c</span><span class="p">.</span><span class="n">empty</span><span class="p">()</span>
 </pre></div>
@@ -312,7 +303,7 @@ can be safely devirtualized.</p>
 </div>
 <div class="section" id="bifurcation">
 <h3>3.2.2.7. Bifurcation<a class="headerlink" href="#bifurcation" title="Permalink to this headline">¶</a></h3>
-<p>ExprEngine::BifurcateCall implements the <code class="docutils literal"><span class="pre">-analyzer-config</span> <span class="pre">ipa=dynamic-bifurcate</span></code>
+<p>ExprEngine::BifurcateCall implements the <code class="docutils literal notranslate"><span class="pre">-analyzer-config</span> <span class="pre">ipa=dynamic-bifurcate</span></code>
 mode.</p>
 <p>When a call is made on an object with imprecise dynamic type information
 (RuntimeDefinition::mayHaveOtherDefinitions() evaluates to TRUE), ExprEngine
@@ -321,7 +312,7 @@ RuntimeDefinition object) with a path-sensitive “mode” in the ProgramState.<
 <p>Currently, there are 2 modes:</p>
 <ul class="simple">
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">DynamicDispatchModeInlined</span></code> - Models the case where the dynamic type information</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">DynamicDispatchModeInlined</span></code> - Models the case where the dynamic type information</dt>
 <dd>of the receiver (MemoryRegion) is assumed to be perfectly constrained so
 that a given definition of a method is expected to be the code actually
 called. When this mode is set, ExprEngine uses the Decl from
@@ -330,7 +321,7 @@ receiver because the function definition is considered to be fully resolved.</dd
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">DynamicDispatchModeConservative</span></code> - Models the case where the dynamic type</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">DynamicDispatchModeConservative</span></code> - Models the case where the dynamic type</dt>
 <dd>information is assumed to be incorrect, for example, implies that the method
 definition is overridden in a subclass. In such cases, ExprEngine does not
 inline the methods sent to the receiver (MemoryRegion), even if a candidate
@@ -428,7 +419,7 @@ non-top-level StackFrameContexts fairly easily.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

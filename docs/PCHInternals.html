@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Precompiled Header and Modules Internals &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ABI tags" href="ItaniumMangleAbiTags.html" />
     <link rel="prev" title="Driver Design &amp; Internals" href="DriverInternals.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>Precompiled Header and Modules Internals</span></h2>
@@ -50,7 +41,7 @@
 <h1>Precompiled Header and Modules Internals<a class="headerlink" href="#precompiled-header-and-modules-internals" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#using-precompiled-headers-with-clang" id="id1">Using Precompiled Headers with <code class="docutils literal"><span class="pre">clang</span></code></a></li>
+<li><a class="reference internal" href="#using-precompiled-headers-with-clang" id="id1">Using Precompiled Headers with <code class="docutils literal notranslate"><span class="pre">clang</span></code></a></li>
 <li><a class="reference internal" href="#design-philosophy" id="id2">Design Philosophy</a></li>
 <li><a class="reference internal" href="#ast-file-contents" id="id3">AST File Contents</a><ul>
 <li><a class="reference internal" href="#metadata-block" id="id4">Metadata Block</a></li>
@@ -72,19 +63,19 @@
 headers (PCH) and modules.  If you are interested in the end-user view, please
 see the <a class="reference internal" href="UsersManual.html#usersmanual-precompiled-headers"><span class="std std-ref">User’s Manual</span></a>.</p>
 <div class="section" id="using-precompiled-headers-with-clang">
-<h2><a class="toc-backref" href="#id1">Using Precompiled Headers with <code class="docutils literal"><span class="pre">clang</span></code></a><a class="headerlink" href="#using-precompiled-headers-with-clang" title="Permalink to this headline">¶</a></h2>
-<p>The Clang compiler frontend, <code class="docutils literal"><span class="pre">clang</span> <span class="pre">-cc1</span></code>, supports two command line options
+<h2><a class="toc-backref" href="#id1">Using Precompiled Headers with <code class="docutils literal notranslate"><span class="pre">clang</span></code></a><a class="headerlink" href="#using-precompiled-headers-with-clang" title="Permalink to this headline">¶</a></h2>
+<p>The Clang compiler frontend, <code class="docutils literal notranslate"><span class="pre">clang</span> <span class="pre">-cc1</span></code>, supports two command line options
 for generating and using PCH files.</p>
-<p>To generate PCH files using <code class="docutils literal"><span class="pre">clang</span> <span class="pre">-cc1</span></code>, use the option <cite>-emit-pch</cite>:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ clang -cc1 test.h -emit-pch -o test.h.pch
+<p>To generate PCH files using <code class="docutils literal notranslate"><span class="pre">clang</span> <span class="pre">-cc1</span></code>, use the option <cite>-emit-pch</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ clang -cc1 test.h -emit-pch -o test.h.pch
 </pre></div>
 </div>
-<p>This option is transparently used by <code class="docutils literal"><span class="pre">clang</span></code> when generating PCH files.  The
+<p>This option is transparently used by <code class="docutils literal notranslate"><span class="pre">clang</span></code> when generating PCH files.  The
 resulting PCH file contains the serialized form of the compiler’s internal
 representation after it has completed parsing and semantic analysis.  The PCH
 file can then be used as a prefix header with the <cite>-include-pch</cite>
 option:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ clang -cc1 -include-pch test.h.pch test.c -o test.s
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ clang -cc1 -include-pch test.h.pch test.c -o test.s
 </pre></div>
 </div>
 </div>
@@ -136,10 +127,10 @@ proportional to the amount of code actually used from the AST file, rather than
 being proportional to the size of the AST file itself.</p>
 <p>When given the <cite>-print-stats</cite> option, Clang produces statistics
 describing how much of the AST file was actually loaded from disk.  For a
-simple “Hello, World!” program that includes the Apple <code class="docutils literal"><span class="pre">Cocoa.h</span></code> header
+simple “Hello, World!” program that includes the Apple <code class="docutils literal notranslate"><span class="pre">Cocoa.h</span></code> header
 (which is built as a precompiled header), this option illustrates how little of
 the actual precompiled header is required:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>*** AST File Statistics:
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>*** AST File Statistics:
   895/39981 source location entries read (2.238563%)
   19/15315 types read (0.124061%)
   20/82685 declarations read (0.024188%)
@@ -170,19 +161,19 @@ section</span></a>.</p>
 </div>
 <div class="section" id="ast-file-contents">
 <h2><a class="toc-backref" href="#id3">AST File Contents</a><a class="headerlink" href="#ast-file-contents" title="Permalink to this headline">¶</a></h2>
-<p>An AST file produced by clang is an object file container with a <code class="docutils literal"><span class="pre">clangast</span></code>
-(COFF) or <code class="docutils literal"><span class="pre">__clangast</span></code> (ELF and Mach-O) section containing the serialized AST.
+<p>An AST file produced by clang is an object file container with a <code class="docutils literal notranslate"><span class="pre">clangast</span></code>
+(COFF) or <code class="docutils literal notranslate"><span class="pre">__clangast</span></code> (ELF and Mach-O) section containing the serialized AST.
 Other target-specific sections in the object file container are used to hold
 debug information for the data types defined in the AST.  Tools built on top of
 libclang that do not need debug information may also produce raw AST files that
 only contain the serialized AST.</p>
-<p>The <code class="docutils literal"><span class="pre">clangast</span></code> section is organized into several different blocks, each of
+<p>The <code class="docutils literal notranslate"><span class="pre">clangast</span></code> section is organized into several different blocks, each of
 which contains the serialized representation of a part of Clang’s internal
 representation.  Each of the blocks corresponds to either a block or a record
 within <a class="reference external" href="https://llvm.org/docs/BitCodeFormat.html">LLVM’s bitstream format</a>.
 The contents of each of these logical blocks are described below.</p>
 <img alt="_images/PCHLayout.png" src="_images/PCHLayout.png" />
-<p>The <code class="docutils literal"><span class="pre">llvm-objdump</span></code> utility provides a <code class="docutils literal"><span class="pre">-raw-clang-ast</span></code> option to extract the
+<p>The <code class="docutils literal notranslate"><span class="pre">llvm-objdump</span></code> utility provides a <code class="docutils literal notranslate"><span class="pre">-raw-clang-ast</span></code> option to extract the
 binary contents of the AST section from an object file container.</p>
 <p>The <a class="reference external" href="https://llvm.org/docs/CommandGuide/llvm-bcanalyzer.html">llvm-bcanalyzer</a>
 utility can be used to examine the actual structure of the bitstream for the AST
@@ -200,11 +191,11 @@ contains information about:</p>
 <dt>Language options</dt>
 <dd>Describes the particular language dialect used to compile the AST file,
 including major options (e.g., Objective-C support) and more minor options
-(e.g., support for “<code class="docutils literal"><span class="pre">//</span></code>” comments).  The contents of this record correspond to
-the <code class="docutils literal"><span class="pre">LangOptions</span></code> class.</dd>
+(e.g., support for “<code class="docutils literal notranslate"><span class="pre">//</span></code>” comments).  The contents of this record correspond to
+the <code class="docutils literal notranslate"><span class="pre">LangOptions</span></code> class.</dd>
 <dt>Target architecture</dt>
 <dd>The target triple that describes the architecture, platform, and ABI for
-which the AST file was generated, e.g., <code class="docutils literal"><span class="pre">i386-apple-darwin9</span></code>.</dd>
+which the AST file was generated, e.g., <code class="docutils literal notranslate"><span class="pre">i386-apple-darwin9</span></code>.</dd>
 <dt>AST version</dt>
 <dd>The major and minor version numbers of the AST file format.  Changes in the
 minor version number should not affect backward compatibility, while changes
@@ -217,7 +208,7 @@ precompiled header (and vice-versa).</dd>
 is used in the validation of the AST file.  The predefines buffer itself
 contains code generated by the compiler to initialize the preprocessor state
 according to the current target, platform, and command-line options.  For
-example, the predefines buffer will contain “<code class="docutils literal"><span class="pre">#define</span> <span class="pre">__STDC__</span> <span class="pre">1</span></code>” when we
+example, the predefines buffer will contain “<code class="docutils literal notranslate"><span class="pre">#define</span> <span class="pre">__STDC__</span> <span class="pre">1</span></code>” when we
 are compiling C without Microsoft extensions.  The predefines buffer itself
 is stored within the <a class="reference internal" href="#pchinternals-sourcemgr"><span class="std std-ref">Source Manager Block</span></a>, but its contents are
 verified along with the rest of the metadata.</dd>
@@ -251,7 +242,7 @@ instantiation history inside the header itself.</p>
 that were included when building the AST file.  This includes information about
 the controlling macro for the header (e.g., when the preprocessor identified
 that the contents of the header dependent on a macro like
-<code class="docutils literal"><span class="pre">LLVM_CLANG_SOURCEMANAGER_H</span></code>).</p>
+<code class="docutils literal notranslate"><span class="pre">LLVM_CLANG_SOURCEMANAGER_H</span></code>).</p>
 </div>
 <div class="section" id="preprocessor-block">
 <span id="pchinternals-preprocessor"></span><h3><a class="toc-backref" href="#id6">Preprocessor Block</a><a class="headerlink" href="#preprocessor-block" title="Permalink to this headline">¶</a></h3>
@@ -266,46 +257,46 @@ lazy loading of macro definitions is triggered by lookups into the
 <div class="section" id="types-block">
 <span id="pchinternals-types"></span><h3><a class="toc-backref" href="#id7">Types Block</a><a class="headerlink" href="#types-block" title="Permalink to this headline">¶</a></h3>
 <p>The types block contains the serialized representation of all of the types
-referenced in the translation unit.  Each Clang type node (<code class="docutils literal"><span class="pre">PointerType</span></code>,
-<code class="docutils literal"><span class="pre">FunctionProtoType</span></code>, etc.) has a corresponding record type in the AST file.
+referenced in the translation unit.  Each Clang type node (<code class="docutils literal notranslate"><span class="pre">PointerType</span></code>,
+<code class="docutils literal notranslate"><span class="pre">FunctionProtoType</span></code>, etc.) has a corresponding record type in the AST file.
 When types are deserialized from the AST file, the data within the record is
 used to reconstruct the appropriate type node using the AST context.</p>
 <p>Each type has a unique type ID, which is an integer that uniquely identifies
 that type.  Type ID 0 represents the NULL type, type IDs less than
-<code class="docutils literal"><span class="pre">NUM_PREDEF_TYPE_IDS</span></code> represent predefined types (<code class="docutils literal"><span class="pre">void</span></code>, <code class="docutils literal"><span class="pre">float</span></code>, etc.),
+<code class="docutils literal notranslate"><span class="pre">NUM_PREDEF_TYPE_IDS</span></code> represent predefined types (<code class="docutils literal notranslate"><span class="pre">void</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, etc.),
 while other “user-defined” type IDs are assigned consecutively from
-<code class="docutils literal"><span class="pre">NUM_PREDEF_TYPE_IDS</span></code> upward as the types are encountered.  The AST file has
+<code class="docutils literal notranslate"><span class="pre">NUM_PREDEF_TYPE_IDS</span></code> upward as the types are encountered.  The AST file has
 an associated mapping from the user-defined types block to the location within
 the types block where the serialized representation of that type resides,
 enabling lazy deserialization of types.  When a type is referenced from within
 the AST file, that reference is encoded using the type ID shifted left by 3
-bits.  The lower three bits are used to represent the <code class="docutils literal"><span class="pre">const</span></code>, <code class="docutils literal"><span class="pre">volatile</span></code>,
-and <code class="docutils literal"><span class="pre">restrict</span></code> qualifiers, as in Clang’s <a class="reference internal" href="InternalsManual.html#qualtype"><span class="std std-ref">QualType</span></a> class.</p>
+bits.  The lower three bits are used to represent the <code class="docutils literal notranslate"><span class="pre">const</span></code>, <code class="docutils literal notranslate"><span class="pre">volatile</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">restrict</span></code> qualifiers, as in Clang’s <a class="reference internal" href="InternalsManual.html#qualtype"><span class="std std-ref">QualType</span></a> class.</p>
 </div>
 <div class="section" id="declarations-block">
 <span id="pchinternals-decls"></span><h3><a class="toc-backref" href="#id8">Declarations Block</a><a class="headerlink" href="#declarations-block" title="Permalink to this headline">¶</a></h3>
 <p>The declarations block contains the serialized representation of all of the
 declarations referenced in the translation unit.  Each Clang declaration node
-(<code class="docutils literal"><span class="pre">VarDecl</span></code>, <code class="docutils literal"><span class="pre">FunctionDecl</span></code>, etc.) has a corresponding record type in the
+(<code class="docutils literal notranslate"><span class="pre">VarDecl</span></code>, <code class="docutils literal notranslate"><span class="pre">FunctionDecl</span></code>, etc.) has a corresponding record type in the
 AST file.  When declarations are deserialized from the AST file, the data
 within the record is used to build and populate a new instance of the
-corresponding <code class="docutils literal"><span class="pre">Decl</span></code> node.  As with types, each declaration node has a
+corresponding <code class="docutils literal notranslate"><span class="pre">Decl</span></code> node.  As with types, each declaration node has a
 numeric ID that is used to refer to that declaration within the AST file.  In
 addition, a lookup table provides a mapping from that numeric ID to the offset
 within the precompiled header where that declaration is described.</p>
 <p>Declarations in Clang’s abstract syntax trees are stored hierarchically.  At
-the top of the hierarchy is the translation unit (<code class="docutils literal"><span class="pre">TranslationUnitDecl</span></code>),
+the top of the hierarchy is the translation unit (<code class="docutils literal notranslate"><span class="pre">TranslationUnitDecl</span></code>),
 which contains all of the declarations in the translation unit but is not
 actually written as a specific declaration node.  Its child declarations (such
 as functions or struct types) may also contain other declarations inside them,
 and so on.  Within Clang, each declaration is stored within a <a class="reference internal" href="InternalsManual.html#declcontext"><span class="std std-ref">declaration
-context</span></a>, as represented by the <code class="docutils literal"><span class="pre">DeclContext</span></code> class.
+context</span></a>, as represented by the <code class="docutils literal notranslate"><span class="pre">DeclContext</span></code> class.
 Declaration contexts provide the mechanism to perform name lookup within a
-given declaration (e.g., find the member named <code class="docutils literal"><span class="pre">x</span></code> in a structure) and
+given declaration (e.g., find the member named <code class="docutils literal notranslate"><span class="pre">x</span></code> in a structure) and
 iterate over the declarations stored within a context (e.g., iterate over all
 of the fields of a structure for structure layout).</p>
 <p>In Clang’s AST file format, deserializing a declaration that is a
-<code class="docutils literal"><span class="pre">DeclContext</span></code> is a separate operation from deserializing all of the
+<code class="docutils literal notranslate"><span class="pre">DeclContext</span></code> is a separate operation from deserializing all of the
 declarations stored within that declaration context.  Therefore, Clang will
 deserialize the translation unit declaration without deserializing the
 declarations within that translation unit.  When required, the declarations
@@ -313,9 +304,9 @@ stored within a declaration context will be deserialized.  There are two
 representations of the declarations within a declaration context, which
 correspond to the name-lookup and iteration behavior described above:</p>
 <ul class="simple">
-<li>When the front end performs name lookup to find a name <code class="docutils literal"><span class="pre">x</span></code> within a given
+<li>When the front end performs name lookup to find a name <code class="docutils literal notranslate"><span class="pre">x</span></code> within a given
 declaration context (for example, during semantic analysis of the expression
-<code class="docutils literal"><span class="pre">p-&gt;x</span></code>, where <code class="docutils literal"><span class="pre">p</span></code>’s type is defined in the precompiled header), Clang
+<code class="docutils literal notranslate"><span class="pre">p-&gt;x</span></code>, where <code class="docutils literal notranslate"><span class="pre">p</span></code>’s type is defined in the precompiled header), Clang
 refers to an on-disk hash table that maps from the names within that
 declaration context to the declaration IDs that represent each visible
 declaration with that name.  The actual declarations will then be
@@ -340,37 +331,37 @@ immediately following the declaration or type that owns the statement or
 expression.  For example, the statement representing the body of a function
 will be stored directly following the declaration of the function.</p>
 <p>As with types and declarations, each statement and expression kind in Clang’s
-abstract syntax tree (<code class="docutils literal"><span class="pre">ForStmt</span></code>, <code class="docutils literal"><span class="pre">CallExpr</span></code>, etc.) has a corresponding
+abstract syntax tree (<code class="docutils literal notranslate"><span class="pre">ForStmt</span></code>, <code class="docutils literal notranslate"><span class="pre">CallExpr</span></code>, etc.) has a corresponding
 record type in the AST file, which contains the serialized representation of
 that statement or expression.  Each substatement or subexpression within an
 expression is stored as a separate record (which keeps most records to a fixed
 size).  Within the AST file, the subexpressions of an expression are stored, in
 reverse order, prior to the expression that owns those expression, using a form
 of <a class="reference external" href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">Reverse Polish Notation</a>. For example, an
-expression <code class="docutils literal"><span class="pre">3</span> <span class="pre">-</span> <span class="pre">4</span> <span class="pre">+</span> <span class="pre">5</span></code> would be represented as follows:</p>
+expression <code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">-</span> <span class="pre">4</span> <span class="pre">+</span> <span class="pre">5</span></code> would be represented as follows:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="100%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">IntegerLiteral(5)</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">IntegerLiteral(5)</span></code></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">IntegerLiteral(4)</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">IntegerLiteral(4)</span></code></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">IntegerLiteral(3)</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">IntegerLiteral(3)</span></code></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">IntegerLiteral(-)</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">IntegerLiteral(-)</span></code></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">IntegerLiteral(+)</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">IntegerLiteral(+)</span></code></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">STOP</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">STOP</span></code></td>
 </tr>
 </tbody>
 </table>
 <p>When reading this representation, Clang evaluates each expression record it
 encounters, builds the appropriate abstract syntax tree node, and then pushes
 that expression on to a stack.  When a record contains <em>N</em> subexpressions —
-<code class="docutils literal"><span class="pre">BinaryOperator</span></code> has two of them — those expressions are popped from the
+<code class="docutils literal notranslate"><span class="pre">BinaryOperator</span></code> has two of them — those expressions are popped from the
 top of the stack.  The special STOP code indicates that we have reached the end
 of a serialized expression or statement; other expression or statement records
 may follow, but they are part of a different expression.</p>
@@ -379,7 +370,7 @@ may follow, but they are part of a different expression.</p>
 <span id="identifier-table-block"></span><h3><a class="toc-backref" href="#id10">Identifier Table Block</a><a class="headerlink" href="#pchinternals-ident-table" title="Permalink to this headline">¶</a></h3>
 <p>The identifier table block contains an on-disk hash table that maps each
 identifier mentioned within the AST file to the serialized representation of
-the identifier’s information (e.g, the <code class="docutils literal"><span class="pre">IdentifierInfo</span></code> structure).  The
+the identifier’s information (e.g, the <code class="docutils literal notranslate"><span class="pre">IdentifierInfo</span></code> structure).  The
 serialized representation contains:</p>
 <ul class="simple">
 <li>The actual identifier string.</li>
@@ -396,7 +387,7 @@ into the identifier table as an external lookup source.  Thus, when the user
 program refers to an identifier that has not yet been seen, Clang will perform
 a lookup into the identifier table.  If an identifier is found, its contents
 (macro definitions, flags, top-level declarations, etc.) will be deserialized,
-at which point the corresponding <code class="docutils literal"><span class="pre">IdentifierInfo</span></code> structure will have the
+at which point the corresponding <code class="docutils literal notranslate"><span class="pre">IdentifierInfo</span></code> structure will have the
 same contents it would have after parsing the headers in the AST file.</p>
 <p>Within the AST file, the identifiers used to name declarations are represented
 with an integral value.  A separate table provides a mapping from this integral
@@ -416,7 +407,7 @@ of the method pool is similar to that of the <a class="reference internal" href=
 during the compilation of the program, Clang will search in the on-disk hash
 table of selectors; if found, Clang will read the Objective-C methods
 associated with that selector into the appropriate front-end data structure
-(<code class="docutils literal"><span class="pre">Sema::InstanceMethodPool</span></code> and <code class="docutils literal"><span class="pre">Sema::FactoryMethodPool</span></code> for instance and
+(<code class="docutils literal notranslate"><span class="pre">Sema::InstanceMethodPool</span></code> and <code class="docutils literal notranslate"><span class="pre">Sema::FactoryMethodPool</span></code> for instance and
 class methods, respectively).</p>
 <p>As with identifiers, selectors are represented by numeric values within the AST
 file.  A separate index maps these numeric selector values to the offset of the
@@ -433,30 +424,30 @@ deserializing the declarations during name lookup requires that the name-lookup
 routines be able to query the AST file to find entities stored there.</p>
 <p>For each Clang data structure that requires direct interaction with the AST
 reader logic, there is an abstract class that provides the interface between
-the two modules.  The <code class="docutils literal"><span class="pre">ASTReader</span></code> class, which handles the loading of an AST
+the two modules.  The <code class="docutils literal notranslate"><span class="pre">ASTReader</span></code> class, which handles the loading of an AST
 file, inherits from all of these abstract classes to provide lazy
-deserialization of Clang’s data structures.  <code class="docutils literal"><span class="pre">ASTReader</span></code> implements the
+deserialization of Clang’s data structures.  <code class="docutils literal notranslate"><span class="pre">ASTReader</span></code> implements the
 following abstract classes:</p>
 <dl class="docutils">
-<dt><code class="docutils literal"><span class="pre">ExternalSLocEntrySource</span></code></dt>
-<dd>This abstract interface is associated with the <code class="docutils literal"><span class="pre">SourceManager</span></code> class, and
+<dt><code class="docutils literal notranslate"><span class="pre">ExternalSLocEntrySource</span></code></dt>
+<dd>This abstract interface is associated with the <code class="docutils literal notranslate"><span class="pre">SourceManager</span></code> class, and
 is used whenever the <a class="reference internal" href="#pchinternals-sourcemgr"><span class="std std-ref">source manager</span></a> needs to
 load the details of a file, buffer, or macro instantiation.</dd>
-<dt><code class="docutils literal"><span class="pre">IdentifierInfoLookup</span></code></dt>
-<dd>This abstract interface is associated with the <code class="docutils literal"><span class="pre">IdentifierTable</span></code> class, and
+<dt><code class="docutils literal notranslate"><span class="pre">IdentifierInfoLookup</span></code></dt>
+<dd>This abstract interface is associated with the <code class="docutils literal notranslate"><span class="pre">IdentifierTable</span></code> class, and
 is used whenever the program source refers to an identifier that has not yet
 been seen.  In this case, the AST reader searches for this identifier within
 its <a class="reference internal" href="#pchinternals-ident-table"><span class="std std-ref">identifier table</span></a> to load any top-level
 declarations or macros associated with that identifier.</dd>
-<dt><code class="docutils literal"><span class="pre">ExternalASTSource</span></code></dt>
-<dd>This abstract interface is associated with the <code class="docutils literal"><span class="pre">ASTContext</span></code> class, and is
+<dt><code class="docutils literal notranslate"><span class="pre">ExternalASTSource</span></code></dt>
+<dd>This abstract interface is associated with the <code class="docutils literal notranslate"><span class="pre">ASTContext</span></code> class, and is
 used whenever the abstract syntax tree nodes need to loaded from the AST
 file.  It provides the ability to de-serialize declarations and types
 identified by their numeric values, read the bodies of functions when
 required, and read the declarations stored within a declaration context
 (either for iteration or for name lookup).</dd>
-<dt><code class="docutils literal"><span class="pre">ExternalSemaSource</span></code></dt>
-<dd>This abstract interface is associated with the <code class="docutils literal"><span class="pre">Sema</span></code> class, and is used
+<dt><code class="docutils literal notranslate"><span class="pre">ExternalSemaSource</span></code></dt>
+<dd>This abstract interface is associated with the <code class="docutils literal notranslate"><span class="pre">Sema</span></code> class, and is used
 whenever semantic analysis needs to read information from the <a class="reference internal" href="#pchinternals-method-pool"><span class="std std-ref">global
 method pool</span></a>.</dd>
 </dl>
@@ -469,9 +460,9 @@ a particular source file is being edited by the user.  To minimize the amount
 of reparsing required after a change to the file, a form of precompiled header
 — called a precompiled <em>preamble</em> — is automatically generated by parsing
 all of the headers in the source file, up to and including the last
-<code class="docutils literal"><span class="pre">#include</span></code>.  When only the source file changes (and none of the headers it
+<code class="docutils literal notranslate"><span class="pre">#include</span></code>.  When only the source file changes (and none of the headers it
 depends on), reparsing of that source file can use the precompiled preamble and
-start parsing after the <code class="docutils literal"><span class="pre">#include</span></code>s, so parsing time is proportional to the
+start parsing after the <code class="docutils literal notranslate"><span class="pre">#include</span></code>s, so parsing time is proportional to the
 size of the source file (rather than all of its includes).  However, the
 compilation of that translation unit may already use a precompiled header: in
 this case, Clang will create the precompiled preamble as a chained precompiled
@@ -485,8 +476,8 @@ translation unit will then include the precompiled header that starts the chain
 the semantic model of chained precompiled headers, because the most-recent
 precompiled header can provide information that overrides the information
 provided by the precompiled headers it depends on, just like a header file
-<code class="docutils literal"><span class="pre">B.h</span></code> that includes another header <code class="docutils literal"><span class="pre">A.h</span></code> can modify the state produced by
-parsing <code class="docutils literal"><span class="pre">A.h</span></code>, e.g., by <code class="docutils literal"><span class="pre">#undef</span></code>’ing a macro defined in <code class="docutils literal"><span class="pre">A.h</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">B.h</span></code> that includes another header <code class="docutils literal notranslate"><span class="pre">A.h</span></code> can modify the state produced by
+parsing <code class="docutils literal notranslate"><span class="pre">A.h</span></code>, e.g., by <code class="docutils literal notranslate"><span class="pre">#undef</span></code>’ing a macro defined in <code class="docutils literal notranslate"><span class="pre">A.h</span></code>.</p>
 <p>There are several ways in which chained precompiled headers generalize the AST
 file model:</p>
 <dl class="docutils">
@@ -541,10 +532,10 @@ will be stored for use when the AST file is imported.</dd>
 <dt>Declaration merging</dt>
 <dd>It is possible for a given entity (from the language’s perspective) to be
 declared multiple times in different places.  For example, two different
-headers can have the declaration of <code class="docutils literal"><span class="pre">printf</span></code> or could forward-declare
-<code class="docutils literal"><span class="pre">struct</span> <span class="pre">stat</span></code>.  If each of those headers is included in a module, and some
+headers can have the declaration of <code class="docutils literal notranslate"><span class="pre">printf</span></code> or could forward-declare
+<code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">stat</span></code>.  If each of those headers is included in a module, and some
 third party imports both of those modules, there is a potentially serious
-problem: name lookup for <code class="docutils literal"><span class="pre">printf</span></code> or <code class="docutils literal"><span class="pre">struct</span> <span class="pre">stat</span></code> will find both
+problem: name lookup for <code class="docutils literal notranslate"><span class="pre">printf</span></code> or <code class="docutils literal notranslate"><span class="pre">struct</span> <span class="pre">stat</span></code> will find both
 declarations, but the AST nodes are unrelated.  This would result in a
 compilation error, due to an ambiguity in name lookup.  Therefore, the AST
 reader performs declaration merging according to the appropriate language
@@ -583,7 +574,7 @@ is notified of the import.</dd>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

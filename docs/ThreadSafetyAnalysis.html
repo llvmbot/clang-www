@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Thread Safety Analysis &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="AddressSanitizer" href="AddressSanitizer.html" />
     <link rel="prev" title="3.5. Region Store" href="analyzer/developer-docs/RegionStore.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>Thread Safety Analysis</span></h2>
@@ -57,17 +48,17 @@ under active development, but it is mature enough to be deployed in an
 industrial setting.  It is being developed by Google, in collaboration with
 CERT/SEI, and is used extensively in Google’s internal code base.</p>
 <p>Thread safety analysis works very much like a type system for multi-threaded
-programs.  In addition to declaring the <em>type</em> of data (e.g. <code class="docutils literal"><span class="pre">int</span></code>, <code class="docutils literal"><span class="pre">float</span></code>,
+programs.  In addition to declaring the <em>type</em> of data (e.g. <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>,
 etc.), the programmer can (optionally) declare how access to that data is
-controlled in a multi-threaded environment.  For example, if <code class="docutils literal"><span class="pre">foo</span></code> is
-<em>guarded by</em> the mutex <code class="docutils literal"><span class="pre">mu</span></code>, then the analysis will issue a warning whenever
-a piece of code reads or writes to <code class="docutils literal"><span class="pre">foo</span></code> without first locking <code class="docutils literal"><span class="pre">mu</span></code>.
+controlled in a multi-threaded environment.  For example, if <code class="docutils literal notranslate"><span class="pre">foo</span></code> is
+<em>guarded by</em> the mutex <code class="docutils literal notranslate"><span class="pre">mu</span></code>, then the analysis will issue a warning whenever
+a piece of code reads or writes to <code class="docutils literal notranslate"><span class="pre">foo</span></code> without first locking <code class="docutils literal notranslate"><span class="pre">mu</span></code>.
 Similarly, if there are particular routines that should only be called by
 the GUI thread, then the analysis will warn if other threads call those
 routines.</p>
 <div class="section" id="getting-started">
 <h3>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;mutex.h&quot;</span><span class="cp"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;mutex.h&quot;</span><span class="cp"></span>
 
 <span class="k">class</span> <span class="nc">BankAccount</span> <span class="p">{</span>
 <span class="k">private</span><span class="o">:</span>
@@ -98,28 +89,28 @@ routines.</p>
 </pre></div>
 </div>
 <p>This example demonstrates the basic concepts behind the analysis.  The
-<code class="docutils literal"><span class="pre">GUARDED_BY</span></code> attribute declares that a thread must lock <code class="docutils literal"><span class="pre">mu</span></code> before it can
-read or write to <code class="docutils literal"><span class="pre">balance</span></code>, thus ensuring that the increment and decrement
-operations are atomic.  Similarly, <code class="docutils literal"><span class="pre">REQUIRES</span></code> declares that
-the calling thread must lock <code class="docutils literal"><span class="pre">mu</span></code> before calling <code class="docutils literal"><span class="pre">withdrawImpl</span></code>.
-Because the caller is assumed to have locked <code class="docutils literal"><span class="pre">mu</span></code>, it is safe to modify
-<code class="docutils literal"><span class="pre">balance</span></code> within the body of the method.</p>
-<p>The <code class="docutils literal"><span class="pre">depositImpl()</span></code> method does not have <code class="docutils literal"><span class="pre">REQUIRES</span></code>, so the
+<code class="docutils literal notranslate"><span class="pre">GUARDED_BY</span></code> attribute declares that a thread must lock <code class="docutils literal notranslate"><span class="pre">mu</span></code> before it can
+read or write to <code class="docutils literal notranslate"><span class="pre">balance</span></code>, thus ensuring that the increment and decrement
+operations are atomic.  Similarly, <code class="docutils literal notranslate"><span class="pre">REQUIRES</span></code> declares that
+the calling thread must lock <code class="docutils literal notranslate"><span class="pre">mu</span></code> before calling <code class="docutils literal notranslate"><span class="pre">withdrawImpl</span></code>.
+Because the caller is assumed to have locked <code class="docutils literal notranslate"><span class="pre">mu</span></code>, it is safe to modify
+<code class="docutils literal notranslate"><span class="pre">balance</span></code> within the body of the method.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">depositImpl()</span></code> method does not have <code class="docutils literal notranslate"><span class="pre">REQUIRES</span></code>, so the
 analysis issues a warning.  Thread safety analysis is not inter-procedural, so
 caller requirements must be explicitly declared.
-There is also a warning in <code class="docutils literal"><span class="pre">transferFrom()</span></code>, because although the method
-locks <code class="docutils literal"><span class="pre">this-&gt;mu</span></code>, it does not lock <code class="docutils literal"><span class="pre">b.mu</span></code>.  The analysis understands
+There is also a warning in <code class="docutils literal notranslate"><span class="pre">transferFrom()</span></code>, because although the method
+locks <code class="docutils literal notranslate"><span class="pre">this-&gt;mu</span></code>, it does not lock <code class="docutils literal notranslate"><span class="pre">b.mu</span></code>.  The analysis understands
 that these are two separate mutexes, in two different objects.</p>
-<p>Finally, there is a warning in the <code class="docutils literal"><span class="pre">withdraw()</span></code> method, because it fails to
-unlock <code class="docutils literal"><span class="pre">mu</span></code>.  Every lock must have a corresponding unlock, and the analysis
+<p>Finally, there is a warning in the <code class="docutils literal notranslate"><span class="pre">withdraw()</span></code> method, because it fails to
+unlock <code class="docutils literal notranslate"><span class="pre">mu</span></code>.  Every lock must have a corresponding unlock, and the analysis
 will detect both double locks, and double unlocks.  A function is allowed to
 acquire a lock without releasing it, (or vice versa), but it must be annotated
-as such (using <code class="docutils literal"><span class="pre">ACQUIRE</span></code>/<code class="docutils literal"><span class="pre">RELEASE</span></code>).</p>
+as such (using <code class="docutils literal notranslate"><span class="pre">ACQUIRE</span></code>/<code class="docutils literal notranslate"><span class="pre">RELEASE</span></code>).</p>
 </div>
 <div class="section" id="running-the-analysis">
 <h3>Running The Analysis<a class="headerlink" href="#running-the-analysis" title="Permalink to this headline">¶</a></h3>
-<p>To run the analysis, simply compile with the <code class="docutils literal"><span class="pre">-Wthread-safety</span></code> flag, e.g.</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>clang -c -Wthread-safety example.cpp
+<p>To run the analysis, simply compile with the <code class="docutils literal notranslate"><span class="pre">-Wthread-safety</span></code> flag, e.g.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>clang -c -Wthread-safety example.cpp
 </pre></div>
 </div>
 <p>Note that this example assumes the presence of a suitably annotated
@@ -137,9 +128,9 @@ read/write the data) unless it has the <em>capability</em> to do so.</p>
 <p>Capabilities are associated with named C++ objects which declare specific
 methods to acquire and release the capability.  The name of the object serves
 to identify the capability.  The most common example is a mutex.  For example,
-if <code class="docutils literal"><span class="pre">mu</span></code> is a mutex, then calling <code class="docutils literal"><span class="pre">mu.Lock()</span></code> causes the calling thread
-to acquire the capability to access data that is protected by <code class="docutils literal"><span class="pre">mu</span></code>. Similarly,
-calling <code class="docutils literal"><span class="pre">mu.Unlock()</span></code> releases that capability.</p>
+if <code class="docutils literal notranslate"><span class="pre">mu</span></code> is a mutex, then calling <code class="docutils literal notranslate"><span class="pre">mu.Lock()</span></code> causes the calling thread
+to acquire the capability to access data that is protected by <code class="docutils literal notranslate"><span class="pre">mu</span></code>. Similarly,
+calling <code class="docutils literal notranslate"><span class="pre">mu.Unlock()</span></code> releases that capability.</p>
 <p>A thread may hold a capability either <em>exclusively</em> or <em>shared</em>.  An exclusive
 capability can be held by only one thread at a time, while a shared capability
 can be held by many threads at the same time.  This mechanism enforces a
@@ -176,13 +167,13 @@ general capability model.  The prior names are still in use, and will be
 mentioned under the tag <em>previously</em> where appropriate.</p>
 <div class="section" id="guarded-by-c-and-pt-guarded-by-c">
 <h3>GUARDED_BY(c) and PT_GUARDED_BY(c)<a class="headerlink" href="#guarded-by-c-and-pt-guarded-by-c" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal"><span class="pre">GUARDED_BY</span></code> is an attribute on data members, which declares that the data
+<p><code class="docutils literal notranslate"><span class="pre">GUARDED_BY</span></code> is an attribute on data members, which declares that the data
 member is protected by the given capability.  Read operations on the data
 require shared access, while write operations require exclusive access.</p>
-<p><code class="docutils literal"><span class="pre">PT_GUARDED_BY</span></code> is similar, but is intended for use on pointers and smart
+<p><code class="docutils literal notranslate"><span class="pre">PT_GUARDED_BY</span></code> is similar, but is intended for use on pointers and smart
 pointers. There is no constraint on the data member itself, but the <em>data that
 it points to</em> is protected by the given capability.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
 <span class="kt">int</span> <span class="o">*</span><span class="n">p1</span>             <span class="nf">GUARDED_BY</span><span class="p">(</span><span class="n">mu</span><span class="p">);</span>
 <span class="kt">int</span> <span class="o">*</span><span class="n">p2</span>             <span class="nf">PT_GUARDED_BY</span><span class="p">(</span><span class="n">mu</span><span class="p">);</span>
 <span class="n">unique_ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">p3</span>  <span class="n">PT_GUARDED_BY</span><span class="p">(</span><span class="n">mu</span><span class="p">);</span>
@@ -201,13 +192,13 @@ it points to</em> is protected by the given capability.</p>
 </div>
 <div class="section" id="requires-requires-shared">
 <h3>REQUIRES(…), REQUIRES_SHARED(…)<a class="headerlink" href="#requires-requires-shared" title="Permalink to this headline">¶</a></h3>
-<p><em>Previously</em>: <code class="docutils literal"><span class="pre">EXCLUSIVE_LOCKS_REQUIRED</span></code>, <code class="docutils literal"><span class="pre">SHARED_LOCKS_REQUIRED</span></code></p>
-<p><code class="docutils literal"><span class="pre">REQUIRES</span></code> is an attribute on functions or methods, which
+<p><em>Previously</em>: <code class="docutils literal notranslate"><span class="pre">EXCLUSIVE_LOCKS_REQUIRED</span></code>, <code class="docutils literal notranslate"><span class="pre">SHARED_LOCKS_REQUIRED</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">REQUIRES</span></code> is an attribute on functions or methods, which
 declares that the calling thread must have exclusive access to the given
 capabilities.  More than one capability may be specified.  The capabilities
 must be held on entry to the function, <em>and must still be held on exit</em>.</p>
-<p><code class="docutils literal"><span class="pre">REQUIRES_SHARED</span></code> is similar, but requires only shared access.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">mu1</span><span class="p">,</span> <span class="n">mu2</span><span class="p">;</span>
+<p><code class="docutils literal notranslate"><span class="pre">REQUIRES_SHARED</span></code> is similar, but requires only shared access.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">mu1</span><span class="p">,</span> <span class="n">mu2</span><span class="p">;</span>
 <span class="kt">int</span> <span class="n">a</span> <span class="nf">GUARDED_BY</span><span class="p">(</span><span class="n">mu1</span><span class="p">);</span>
 <span class="kt">int</span> <span class="n">b</span> <span class="nf">GUARDED_BY</span><span class="p">(</span><span class="n">mu2</span><span class="p">);</span>
 
@@ -226,17 +217,17 @@ must be held on entry to the function, <em>and must still be held on exit</em>.<
 </div>
 <div class="section" id="acquire-acquire-shared-release-release-shared">
 <h3>ACQUIRE(…), ACQUIRE_SHARED(…), RELEASE(…), RELEASE_SHARED(…)<a class="headerlink" href="#acquire-acquire-shared-release-release-shared" title="Permalink to this headline">¶</a></h3>
-<p><em>Previously</em>: <code class="docutils literal"><span class="pre">EXCLUSIVE_LOCK_FUNCTION</span></code>, <code class="docutils literal"><span class="pre">SHARED_LOCK_FUNCTION</span></code>,
-<code class="docutils literal"><span class="pre">UNLOCK_FUNCTION</span></code></p>
-<p><code class="docutils literal"><span class="pre">ACQUIRE</span></code> is an attribute on functions or methods, which
+<p><em>Previously</em>: <code class="docutils literal notranslate"><span class="pre">EXCLUSIVE_LOCK_FUNCTION</span></code>, <code class="docutils literal notranslate"><span class="pre">SHARED_LOCK_FUNCTION</span></code>,
+<code class="docutils literal notranslate"><span class="pre">UNLOCK_FUNCTION</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">ACQUIRE</span></code> is an attribute on functions or methods, which
 declares that the function acquires a capability, but does not release it.  The
 caller must not hold the given capability on entry, and it will hold the
-capability on exit.  <code class="docutils literal"><span class="pre">ACQUIRE_SHARED</span></code> is similar.</p>
-<p><code class="docutils literal"><span class="pre">RELEASE</span></code> and <code class="docutils literal"><span class="pre">RELEASE_SHARED</span></code> declare that the function releases the given
+capability on exit.  <code class="docutils literal notranslate"><span class="pre">ACQUIRE_SHARED</span></code> is similar.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RELEASE</span></code> and <code class="docutils literal notranslate"><span class="pre">RELEASE_SHARED</span></code> declare that the function releases the given
 capability.  The caller must hold the capability on entry, and will no longer
 hold it on exit. It does not matter whether the given capability is shared or
 exclusive.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
 <span class="n">MyClass</span> <span class="n">myObject</span> <span class="nf">GUARDED_BY</span><span class="p">(</span><span class="n">mu</span><span class="p">);</span>
 
 <span class="kt">void</span> <span class="nf">lockAndInit</span><span class="p">()</span> <span class="n">ACQUIRE</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span> <span class="p">{</span>
@@ -256,11 +247,11 @@ exclusive.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>If no argument is passed to <code class="docutils literal"><span class="pre">ACQUIRE</span></code> or <code class="docutils literal"><span class="pre">RELEASE</span></code>, then the argument is
-assumed to be <code class="docutils literal"><span class="pre">this</span></code>, and the analysis will not check the body of the
+<p>If no argument is passed to <code class="docutils literal notranslate"><span class="pre">ACQUIRE</span></code> or <code class="docutils literal notranslate"><span class="pre">RELEASE</span></code>, then the argument is
+assumed to be <code class="docutils literal notranslate"><span class="pre">this</span></code>, and the analysis will not check the body of the
 function.  This pattern is intended for use by classes which hide locking
 details behind an abstract interface.  For example:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
 <span class="k">class</span> <span class="nc">CAPABILITY</span><span class="p">(</span><span class="s">&quot;mutex&quot;</span><span class="p">)</span> <span class="n">Container</span> <span class="p">{</span>
 <span class="k">private</span><span class="o">:</span>
   <span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
@@ -285,12 +276,12 @@ details behind an abstract interface.  For example:</p>
 </div>
 <div class="section" id="excludes">
 <h3>EXCLUDES(…)<a class="headerlink" href="#excludes" title="Permalink to this headline">¶</a></h3>
-<p><em>Previously</em>: <code class="docutils literal"><span class="pre">LOCKS_EXCLUDED</span></code></p>
-<p><code class="docutils literal"><span class="pre">EXCLUDES</span></code> is an attribute on functions or methods, which declares that
+<p><em>Previously</em>: <code class="docutils literal notranslate"><span class="pre">LOCKS_EXCLUDED</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">EXCLUDES</span></code> is an attribute on functions or methods, which declares that
 the caller must <em>not</em> hold the given capabilities.  This annotation is
 used to prevent deadlock.  Many mutex implementations are not re-entrant, so
 deadlock can occur if the function acquires the mutex a second time.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
 <span class="kt">int</span> <span class="n">a</span> <span class="nf">GUARDED_BY</span><span class="p">(</span><span class="n">mu</span><span class="p">);</span>
 
 <span class="kt">void</span> <span class="nf">clear</span><span class="p">()</span> <span class="n">EXCLUDES</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span> <span class="p">{</span>
@@ -306,18 +297,18 @@ deadlock can occur if the function acquires the mutex a second time.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Unlike <code class="docutils literal"><span class="pre">REQUIRES</span></code>, <code class="docutils literal"><span class="pre">EXCLUDES</span></code> is optional.  The analysis will not issue a
+<p>Unlike <code class="docutils literal notranslate"><span class="pre">REQUIRES</span></code>, <code class="docutils literal notranslate"><span class="pre">EXCLUDES</span></code> is optional.  The analysis will not issue a
 warning if the attribute is missing, which can lead to false negatives in some
 cases.  This issue is discussed further in <a class="reference internal" href="#negative"><span class="std std-ref">Negative Capabilities</span></a>.</p>
 </div>
 <div class="section" id="no-thread-safety-analysis">
 <h3>NO_THREAD_SAFETY_ANALYSIS<a class="headerlink" href="#no-thread-safety-analysis" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal"><span class="pre">NO_THREAD_SAFETY_ANALYSIS</span></code> is an attribute on functions or methods, which
+<p><code class="docutils literal notranslate"><span class="pre">NO_THREAD_SAFETY_ANALYSIS</span></code> is an attribute on functions or methods, which
 turns off thread safety checking for that method.  It provides an escape hatch
 for functions which are either (1) deliberately thread-unsafe, or (2) are
 thread-safe, but too complicated for the analysis to understand.  Reasons for
 (2) will be described in the <a class="reference internal" href="#limitations"><span class="std std-ref">Known Limitations</span></a>, below.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Counter</span> <span class="p">{</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Counter</span> <span class="p">{</span>
   <span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">a</span> <span class="nf">GUARDED_BY</span><span class="p">(</span><span class="n">mu</span><span class="p">);</span>
 
@@ -327,16 +318,16 @@ thread-safe, but too complicated for the analysis to understand.  Reasons for
 </div>
 <p>Unlike the other attributes, NO_THREAD_SAFETY_ANALYSIS is not part of the
 interface of a function, and should thus be placed on the function definition
-(in the <code class="docutils literal"><span class="pre">.cc</span></code> or <code class="docutils literal"><span class="pre">.cpp</span></code> file) rather than on the function declaration
+(in the <code class="docutils literal notranslate"><span class="pre">.cc</span></code> or <code class="docutils literal notranslate"><span class="pre">.cpp</span></code> file) rather than on the function declaration
 (in the header).</p>
 </div>
 <div class="section" id="return-capability-c">
 <h3>RETURN_CAPABILITY(c)<a class="headerlink" href="#return-capability-c" title="Permalink to this headline">¶</a></h3>
-<p><em>Previously</em>: <code class="docutils literal"><span class="pre">LOCK_RETURNED</span></code></p>
-<p><code class="docutils literal"><span class="pre">RETURN_CAPABILITY</span></code> is an attribute on functions or methods, which declares
+<p><em>Previously</em>: <code class="docutils literal notranslate"><span class="pre">LOCK_RETURNED</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">RETURN_CAPABILITY</span></code> is an attribute on functions or methods, which declares
 that the function returns a reference to the given capability.  It is used to
 annotate getter methods that return mutexes.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
 <span class="k">private</span><span class="o">:</span>
   <span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">a</span> <span class="nf">GUARDED_BY</span><span class="p">(</span><span class="n">mu</span><span class="p">);</span>
@@ -352,11 +343,11 @@ annotate getter methods that return mutexes.</p>
 </div>
 <div class="section" id="acquired-before-acquired-after">
 <h3>ACQUIRED_BEFORE(…), ACQUIRED_AFTER(…)<a class="headerlink" href="#acquired-before-acquired-after" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal"><span class="pre">ACQUIRED_BEFORE</span></code> and <code class="docutils literal"><span class="pre">ACQUIRED_AFTER</span></code> are attributes on member
+<p><code class="docutils literal notranslate"><span class="pre">ACQUIRED_BEFORE</span></code> and <code class="docutils literal notranslate"><span class="pre">ACQUIRED_AFTER</span></code> are attributes on member
 declarations, specifically declarations of mutexes or other capabilities.
 These declarations enforce a particular order in which the mutexes must be
 acquired, in order to prevent deadlock.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">m1</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Mutex</span> <span class="n">m1</span><span class="p">;</span>
 <span class="n">Mutex</span> <span class="n">m2</span> <span class="nf">ACQUIRED_AFTER</span><span class="p">(</span><span class="n">m1</span><span class="p">);</span>
 
 <span class="c1">// Alternative declaration</span>
@@ -374,33 +365,33 @@ acquired, in order to prevent deadlock.</p>
 </div>
 <div class="section" id="capability-string">
 <h3>CAPABILITY(&lt;string&gt;)<a class="headerlink" href="#capability-string" title="Permalink to this headline">¶</a></h3>
-<p><em>Previously</em>: <code class="docutils literal"><span class="pre">LOCKABLE</span></code></p>
-<p><code class="docutils literal"><span class="pre">CAPABILITY</span></code> is an attribute on classes, which specifies that objects of the
+<p><em>Previously</em>: <code class="docutils literal notranslate"><span class="pre">LOCKABLE</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">CAPABILITY</span></code> is an attribute on classes, which specifies that objects of the
 class can be used as a capability.  The string argument specifies the kind of
-capability in error messages, e.g. <code class="docutils literal"><span class="pre">&quot;mutex&quot;</span></code>.  See the <code class="docutils literal"><span class="pre">Container</span></code> example
-given above, or the <code class="docutils literal"><span class="pre">Mutex</span></code> class in <a class="reference internal" href="#mutexheader"><span class="std std-ref">mutex.h</span></a>.</p>
+capability in error messages, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;mutex&quot;</span></code>.  See the <code class="docutils literal notranslate"><span class="pre">Container</span></code> example
+given above, or the <code class="docutils literal notranslate"><span class="pre">Mutex</span></code> class in <a class="reference internal" href="#mutexheader"><span class="std std-ref">mutex.h</span></a>.</p>
 </div>
 <div class="section" id="scoped-capability">
 <h3>SCOPED_CAPABILITY<a class="headerlink" href="#scoped-capability" title="Permalink to this headline">¶</a></h3>
-<p><em>Previously</em>: <code class="docutils literal"><span class="pre">SCOPED_LOCKABLE</span></code></p>
-<p><code class="docutils literal"><span class="pre">SCOPED_CAPABILITY</span></code> is an attribute on classes that implement RAII-style
+<p><em>Previously</em>: <code class="docutils literal notranslate"><span class="pre">SCOPED_LOCKABLE</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">SCOPED_CAPABILITY</span></code> is an attribute on classes that implement RAII-style
 locking, in which a capability is acquired in the constructor, and released in
 the destructor.  Such classes require special handling because the constructor
 and destructor refer to the capability via different names; see the
-<code class="docutils literal"><span class="pre">MutexLocker</span></code> class in <a class="reference internal" href="#mutexheader"><span class="std std-ref">mutex.h</span></a>, below.</p>
+<code class="docutils literal notranslate"><span class="pre">MutexLocker</span></code> class in <a class="reference internal" href="#mutexheader"><span class="std std-ref">mutex.h</span></a>, below.</p>
 </div>
 <div class="section" id="try-acquire-bool-try-acquire-shared-bool">
 <h3>TRY_ACQUIRE(&lt;bool&gt;, …), TRY_ACQUIRE_SHARED(&lt;bool&gt;, …)<a class="headerlink" href="#try-acquire-bool-try-acquire-shared-bool" title="Permalink to this headline">¶</a></h3>
-<p><em>Previously:</em> <code class="docutils literal"><span class="pre">EXCLUSIVE_TRYLOCK_FUNCTION</span></code>, <code class="docutils literal"><span class="pre">SHARED_TRYLOCK_FUNCTION</span></code></p>
+<p><em>Previously:</em> <code class="docutils literal notranslate"><span class="pre">EXCLUSIVE_TRYLOCK_FUNCTION</span></code>, <code class="docutils literal notranslate"><span class="pre">SHARED_TRYLOCK_FUNCTION</span></code></p>
 <p>These are attributes on a function or method that tries to acquire the given
 capability, and returns a boolean value indicating success or failure.
-The first argument must be <code class="docutils literal"><span class="pre">true</span></code> or <code class="docutils literal"><span class="pre">false</span></code>, to specify which return value
+The first argument must be <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>, to specify which return value
 indicates success, and the remaining arguments are interpreted in the same way
-as <code class="docutils literal"><span class="pre">ACQUIRE</span></code>.  See <a class="reference internal" href="#mutexheader"><span class="std std-ref">mutex.h</span></a>, below, for example uses.</p>
+as <code class="docutils literal notranslate"><span class="pre">ACQUIRE</span></code>.  See <a class="reference internal" href="#mutexheader"><span class="std std-ref">mutex.h</span></a>, below, for example uses.</p>
 </div>
 <div class="section" id="assert-capability-and-assert-shared-capability">
 <h3>ASSERT_CAPABILITY(…) and ASSERT_SHARED_CAPABILITY(…)<a class="headerlink" href="#assert-capability-and-assert-shared-capability" title="Permalink to this headline">¶</a></h3>
-<p><em>Previously:</em>  <code class="docutils literal"><span class="pre">ASSERT_EXCLUSIVE_LOCK</span></code>, <code class="docutils literal"><span class="pre">ASSERT_SHARED_LOCK</span></code></p>
+<p><em>Previously:</em>  <code class="docutils literal notranslate"><span class="pre">ASSERT_EXCLUSIVE_LOCK</span></code>, <code class="docutils literal notranslate"><span class="pre">ASSERT_SHARED_LOCK</span></code></p>
 <p>These are attributes on a function or method that does a run-time test to see
 whether the calling thread holds the given capability.  The function is assumed
 to fail (no return) if the capability is not held.  See <a class="reference internal" href="#mutexheader"><span class="std std-ref">mutex.h</span></a>,
@@ -413,27 +404,27 @@ below, for example uses.</p>
 <div class="section" id="warning-flags">
 <h3>Warning flags<a class="headerlink" href="#warning-flags" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">-Wthread-safety</span></code>:  Umbrella flag which turns on the following three:<ul>
-<li><code class="docutils literal"><span class="pre">-Wthread-safety-attributes</span></code>: Sanity checks on attribute syntax.</li>
-<li><code class="docutils literal"><span class="pre">-Wthread-safety-analysis</span></code>: The core analysis.</li>
+<li><code class="docutils literal notranslate"><span class="pre">-Wthread-safety</span></code>:  Umbrella flag which turns on the following three:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">-Wthread-safety-attributes</span></code>: Sanity checks on attribute syntax.</li>
+<li><code class="docutils literal notranslate"><span class="pre">-Wthread-safety-analysis</span></code>: The core analysis.</li>
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">-Wthread-safety-precise</span></code>: Requires that mutex expressions match precisely.</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">-Wthread-safety-precise</span></code>: Requires that mutex expressions match precisely.</dt>
 <dd>This warning can be disabled for code which has a lot of aliases.</dd>
 </dl>
 </li>
-<li><code class="docutils literal"><span class="pre">-Wthread-safety-reference</span></code>: Checks when guarded members are passed by reference.</li>
+<li><code class="docutils literal notranslate"><span class="pre">-Wthread-safety-reference</span></code>: Checks when guarded members are passed by reference.</li>
 </ul>
 </li>
 </ul>
 <p><a class="reference internal" href="#negative"><span class="std std-ref">Negative Capabilities</span></a> are an experimental feature, which are enabled with:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">-Wthread-safety-negative</span></code>:  Negative capabilities.  Off by default.</li>
+<li><code class="docutils literal notranslate"><span class="pre">-Wthread-safety-negative</span></code>:  Negative capabilities.  Off by default.</li>
 </ul>
 <p>When new features and checks are added to the analysis, they can often introduce
 additional warnings.  Those warnings are initially released as <em>beta</em> warnings
 for a period of time, after which they are migrated into the standard analysis.</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">-Wthread-safety-beta</span></code>:  New features.  Off by default.</li>
+<li><code class="docutils literal notranslate"><span class="pre">-Wthread-safety-beta</span></code>:  New features.  Off by default.</li>
 </ul>
 </div>
 </div>
@@ -454,7 +445,7 @@ have transitively exclude that capability.</li>
 </ul>
 </div></blockquote>
 <p>As a result, EXCLUDES can easily produce false negatives:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span> <span class="p">{</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span> <span class="p">{</span>
   <span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
 
   <span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{</span>
@@ -480,11 +471,11 @@ have transitively exclude that capability.</li>
 </div>
 <p>Negative requirements are an alternative EXCLUDES that provide
 a stronger safety guarantee.  A negative requirement uses the  REQUIRES
-attribute, in conjunction with the <code class="docutils literal"><span class="pre">!</span></code> operator, to indicate that a capability
+attribute, in conjunction with the <code class="docutils literal notranslate"><span class="pre">!</span></code> operator, to indicate that a capability
 should <em>not</em> be held.</p>
-<p>For example, using <code class="docutils literal"><span class="pre">REQUIRES(!mu)</span></code> instead of <code class="docutils literal"><span class="pre">EXCLUDES(mu)</span></code> will produce
+<p>For example, using <code class="docutils literal notranslate"><span class="pre">REQUIRES(!mu)</span></code> instead of <code class="docutils literal notranslate"><span class="pre">EXCLUDES(mu)</span></code> will produce
 the appropriate warnings:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FooNeg</span> <span class="p">{</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FooNeg</span> <span class="p">{</span>
   <span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
 
   <span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="n">REQUIRES</span><span class="p">(</span><span class="o">!</span><span class="n">mu</span><span class="p">)</span> <span class="p">{</span>   <span class="c1">// foo() now requires !mu.</span>
@@ -510,7 +501,7 @@ the appropriate warnings:</p>
 </div>
 <p>Negative requirements are an experimental feature which is off by default,
 because it will produce many warnings in existing code.  It can be enabled
-by passing <code class="docutils literal"><span class="pre">-Wthread-safety-negative</span></code>.</p>
+by passing <code class="docutils literal notranslate"><span class="pre">-Wthread-safety-negative</span></code>.</p>
 </div>
 <div class="section" id="frequently-asked-questions">
 <span id="faq"></span><h2>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h2>
@@ -539,7 +530,7 @@ Use-before-declaration is okay within a single class, because attributes are
 parsed at the same time as method bodies. (C++ delays parsing of method bodies
 until the end of the class.)  However, use-before-declaration is not allowed
 between classes, as illustrated below.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">Bar</span> <span class="p">{</span>
   <span class="kt">void</span> <span class="n">bar</span><span class="p">(</span><span class="n">Foo</span><span class="o">*</span> <span class="n">f</span><span class="p">)</span> <span class="n">REQUIRES</span><span class="p">(</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">mu</span><span class="p">);</span>  <span class="c1">// Error: mu undeclared.</span>
@@ -557,13 +548,13 @@ between classes, as illustrated below.</p>
 members, because the locking mechanism used by a thread-safe class is part of
 its internal implementation.  However, private mutexes can sometimes leak into
 the public interface of a class.
-Thread safety attributes follow normal C++ access restrictions, so if <code class="docutils literal"><span class="pre">mu</span></code>
-is a private member of <code class="docutils literal"><span class="pre">c</span></code>, then it is an error to write <code class="docutils literal"><span class="pre">c.mu</span></code> in an
+Thread safety attributes follow normal C++ access restrictions, so if <code class="docutils literal notranslate"><span class="pre">mu</span></code>
+is a private member of <code class="docutils literal notranslate"><span class="pre">c</span></code>, then it is an error to write <code class="docutils literal notranslate"><span class="pre">c.mu</span></code> in an
 attribute.</p>
-<p>One workaround is to (ab)use the <code class="docutils literal"><span class="pre">RETURN_CAPABILITY</span></code> attribute to provide a
+<p>One workaround is to (ab)use the <code class="docutils literal notranslate"><span class="pre">RETURN_CAPABILITY</span></code> attribute to provide a
 public <em>name</em> for a private mutex, without actually exposing the underlying
 mutex.  For example:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
 <span class="k">private</span><span class="o">:</span>
   <span class="n">Mutex</span> <span class="n">mu</span><span class="p">;</span>
 
@@ -581,11 +572,11 @@ mutex.  For example:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>In the above example, <code class="docutils literal"><span class="pre">doSomethingTwice()</span></code> is an external routine that
-requires <code class="docutils literal"><span class="pre">c.mu</span></code> to be locked, which cannot be declared directly because <code class="docutils literal"><span class="pre">mu</span></code>
+<p>In the above example, <code class="docutils literal notranslate"><span class="pre">doSomethingTwice()</span></code> is an external routine that
+requires <code class="docutils literal notranslate"><span class="pre">c.mu</span></code> to be locked, which cannot be declared directly because <code class="docutils literal notranslate"><span class="pre">mu</span></code>
 is private.  This pattern is discouraged because it
 violates encapsulation, but it is sometimes necessary, especially when adding
-annotations to an existing code base.  The workaround is to define <code class="docutils literal"><span class="pre">getMu()</span></code>
+annotations to an existing code base.  The workaround is to define <code class="docutils literal notranslate"><span class="pre">getMu()</span></code>
 as a fake getter method, which is provided only for the benefit of thread
 safety analysis.</p>
 </div>
@@ -594,7 +585,7 @@ safety analysis.</p>
 <p>The analysis must be able to determine whether a lock is held, or not held, at
 every program point.  Thus, sections of code where a lock <em>might be held</em> will
 generate spurious warnings (false positives).  For example:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{</span>
   <span class="kt">bool</span> <span class="n">b</span> <span class="o">=</span> <span class="n">needsToLock</span><span class="p">();</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="n">mu</span><span class="p">.</span><span class="n">Lock</span><span class="p">();</span>
   <span class="p">...</span>  <span class="c1">// Warning!  Mutex &#39;mu&#39; is not held on every path through here.</span>
@@ -607,7 +598,7 @@ generate spurious warnings (false positives).  For example:</p>
 <h3>No checking inside constructors and destructors.<a class="headerlink" href="#no-checking-inside-constructors-and-destructors" title="Permalink to this headline">¶</a></h3>
 <p>The analysis currently does not do any checking inside constructors or
 destructors.  In other words, every constructor and destructor is treated as
-if it was annotated with <code class="docutils literal"><span class="pre">NO_THREAD_SAFETY_ANALYSIS</span></code>.
+if it was annotated with <code class="docutils literal notranslate"><span class="pre">NO_THREAD_SAFETY_ANALYSIS</span></code>.
 The reason for this is that during initialization, only one thread typically
 has access to the object which is being initialized, and it is thus safe (and
 common practice) to initialize guarded members without acquiring any locks.
@@ -624,7 +615,7 @@ determine what data is owned by the enclosing object.</p>
 checking.  It relies only on the declared attributes of a function, and will
 not attempt to inline any method calls.  As a result, code such as the
 following will not work:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
 <span class="k">class</span> <span class="nc">AutoCleanup</span> <span class="p">{</span>
   <span class="n">T</span><span class="o">*</span> <span class="n">object</span><span class="p">;</span>
   <span class="kt">void</span> <span class="p">(</span><span class="n">T</span><span class="o">::*</span><span class="n">mp</span><span class="p">)();</span>
@@ -642,7 +633,7 @@ following will not work:</p>
 <span class="p">}</span>  <span class="c1">// Warning, mu is not unlocked.</span>
 </pre></div>
 </div>
-<p>In this case, the destructor of <code class="docutils literal"><span class="pre">Autocleanup</span></code> calls <code class="docutils literal"><span class="pre">mu.Unlock()</span></code>, so
+<p>In this case, the destructor of <code class="docutils literal notranslate"><span class="pre">Autocleanup</span></code> calls <code class="docutils literal notranslate"><span class="pre">mu.Unlock()</span></code>, so
 the warning is bogus.  However,
 thread safety analysis cannot see the unlock, because it does not attempt to
 inline the destructor.  Moreover, there is no way to annotate the destructor,
@@ -653,7 +644,7 @@ This pattern is simply not supported.</p>
 <h3>No alias analysis.<a class="headerlink" href="#no-alias-analysis" title="Permalink to this headline">¶</a></h3>
 <p>The analysis currently does not track pointer aliases.  Thus, there can be
 false positives if two pointers both point to the same mutex.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MutexUnlocker</span> <span class="p">{</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MutexUnlocker</span> <span class="p">{</span>
   <span class="n">Mutex</span><span class="o">*</span> <span class="n">mu</span><span class="p">;</span>
 
 <span class="k">public</span><span class="o">:</span>
@@ -684,10 +675,10 @@ aliasing for MutexLocker, but does so only for that particular pattern.</p>
 <span id="mutexheader"></span><h2>mutex.h<a class="headerlink" href="#mutex-h" title="Permalink to this headline">¶</a></h2>
 <p>Thread safety analysis can be used with any threading library, but it does
 require that the threading API be wrapped in classes and methods which have the
-appropriate annotations.  The following code provides <code class="docutils literal"><span class="pre">mutex.h</span></code> as an example;
+appropriate annotations.  The following code provides <code class="docutils literal notranslate"><span class="pre">mutex.h</span></code> as an example;
 these methods should be filled in to call the appropriate underlying
 implementation.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#ifndef THREAD_SAFETY_ANALYSIS_MUTEX_H</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef THREAD_SAFETY_ANALYSIS_MUTEX_H</span>
 <span class="cp">#define THREAD_SAFETY_ANALYSIS_MUTEX_H</span>
 
 <span class="c1">// Enable thread safety attributes only with clang.</span>
@@ -900,7 +891,7 @@ implementation.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

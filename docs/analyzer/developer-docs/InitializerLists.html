@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>3.3. Initializer List &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="3.4. Nullability Checks" href="nullability.html" />
     <link rel="prev" title="3.2. Inlining" href="IPA.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>3.3. Initializer List</span></h2>
@@ -64,30 +55,30 @@ the object is reported to be leaked.</p>
 passed into initializer list expressions to immediately escape.</p>
 <p>This fix is overly conservative though. So i did a bit of investigation as to
 how model std::initializer_list better.</p>
-<p>According to the standard, <code class="docutils literal"><span class="pre">std::initializer_list&lt;T&gt;</span></code> is an object that has
-methods <code class="docutils literal"><span class="pre">begin(),</span> <span class="pre">end(),</span> <span class="pre">and</span> <span class="pre">size()</span></code>, where <code class="docutils literal"><span class="pre">begin()</span></code> returns a pointer to continuous
-array of <code class="docutils literal"><span class="pre">size()</span></code> objects of type T, and end() is equal to begin() plus size().
+<p>According to the standard, <code class="docutils literal notranslate"><span class="pre">std::initializer_list&lt;T&gt;</span></code> is an object that has
+methods <code class="docutils literal notranslate"><span class="pre">begin(),</span> <span class="pre">end(),</span> <span class="pre">and</span> <span class="pre">size()</span></code>, where <code class="docutils literal notranslate"><span class="pre">begin()</span></code> returns a pointer to continuous
+array of <code class="docutils literal notranslate"><span class="pre">size()</span></code> objects of type T, and end() is equal to begin() plus size().
 The standard does hint that it should be possible to implement
-<code class="docutils literal"><span class="pre">std::initializer_list&lt;T&gt;</span></code> as a pair of pointers, or as a pointer and a size
+<code class="docutils literal notranslate"><span class="pre">std::initializer_list&lt;T&gt;</span></code> as a pair of pointers, or as a pointer and a size
 integer, however specific fields that the object would contain are an
 implementation detail.</p>
 <p>Ideally, we should be able to model the initializer list’s methods precisely.
 Or, at least, it should be possible to explain to the analyzer that the list
 somehow “takes hold” of the values put into it. Initializer lists can also be
 copied, which is a separate story that i’m not trying to address here.</p>
-<p>The obvious approach to modeling <code class="docutils literal"><span class="pre">std::initializer_list</span></code> in a checker would be to
+<p>The obvious approach to modeling <code class="docutils literal notranslate"><span class="pre">std::initializer_list</span></code> in a checker would be to
 construct a SymbolMetadata for the memory region of the initializer list object,
-which would be of type <code class="docutils literal"><span class="pre">T*</span></code> and represent <code class="docutils literal"><span class="pre">begin()</span></code>, so we’d trivially model <code class="docutils literal"><span class="pre">begin()</span></code>
+which would be of type <code class="docutils literal notranslate"><span class="pre">T*</span></code> and represent <code class="docutils literal notranslate"><span class="pre">begin()</span></code>, so we’d trivially model <code class="docutils literal notranslate"><span class="pre">begin()</span></code>
 as a function that returns this symbol. The array pointed to by that symbol
-would be <code class="docutils literal"><span class="pre">bindLoc()``ed</span> <span class="pre">to</span> <span class="pre">contain</span> <span class="pre">the</span> <span class="pre">list's</span> <span class="pre">contents</span> <span class="pre">(probably</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">``CompoundVal</span></code>
+would be <code class="docutils literal notranslate"><span class="pre">bindLoc()``ed</span> <span class="pre">to</span> <span class="pre">contain</span> <span class="pre">the</span> <span class="pre">list's</span> <span class="pre">contents</span> <span class="pre">(probably</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">``CompoundVal</span></code>
 to produce less bindings in the store). Extent of this array would represent
-<code class="docutils literal"><span class="pre">size()</span></code> and would be equal to the length of the list as written.</p>
+<code class="docutils literal notranslate"><span class="pre">size()</span></code> and would be equal to the length of the list as written.</p>
 <p>So this sounds good, however apparently it does nothing to address our false
-positives: when the list escapes, our <code class="docutils literal"><span class="pre">RegionStoreManager</span></code> is not magically
+positives: when the list escapes, our <code class="docutils literal notranslate"><span class="pre">RegionStoreManager</span></code> is not magically
 guessing that the metadata symbol attached to it, together with its contents,
 should also escape. In fact, it’s impossible to trigger a pointer escape from
 within the checker.</p>
-<p>Approach (1): If only we enabled <code class="docutils literal"><span class="pre">ProgramState::bindLoc(...,</span> <span class="pre">notifyChanges=true)</span></code>
+<p>Approach (1): If only we enabled <code class="docutils literal notranslate"><span class="pre">ProgramState::bindLoc(...,</span> <span class="pre">notifyChanges=true)</span></code>
 to cause pointer escapes (not only region changes) (which sounds like the right
 thing to do anyway) such checker would be able to solve the false positives by
 triggering escapes when binding list elements to the list. However, it’d be as
@@ -107,7 +98,7 @@ causes the smallest amount of layering violations), so that the core knew what
 to escape. This puts a stress on the checkers, but with a smart data map it
 wouldn’t be a problem.</p>
 <p>Approach (4): We could allow checkers to trigger pointer escapes in arbitrary
-moments. If we allow doing this within <code class="docutils literal"><span class="pre">checkPointerEscape</span></code> callback itself, we
+moments. If we allow doing this within <code class="docutils literal notranslate"><span class="pre">checkPointerEscape</span></code> callback itself, we
 would be able to express facts like “when this region escapes, that metadata
 symbol attached to it should also escape”. This sounds like an ultimate freedom,
 with maximum stress on the checkers - still not too much stress when we have
@@ -181,7 +172,7 @@ reachable from here exists another region of type T”. Or even multiple regions
 with different identifiers. This wouldn’t specify how the memory is reachable,
 but it would allow for transfer functions to get at those regions and it would
 allow for invalidation.</p>
-<p>For <code class="docutils literal"><span class="pre">std::initializer_list</span></code> this reachable region would the region for the backing
+<p>For <code class="docutils literal notranslate"><span class="pre">std::initializer_list</span></code> this reachable region would the region for the backing
 array and the transfer functions for begin() and end() yield the beginning and
 end element regions for it.</p>
 <p>In my view this differs from ghost variables in that (1) this storage does
@@ -202,7 +193,7 @@ we’re just modeling arbitrary analysis facts that need to be invalidated when 
 pointer escapes then we shouldn’t try to gin up storage for them just to get
 invalidation for free.</p>
 <p><strong>Artem:</strong></p>
-<p>&gt; In this case, I would be fine with some sort of <code class="docutils literal"><span class="pre">AbstractStorageMemoryRegion</span></code>
+<p>&gt; In this case, I would be fine with some sort of <code class="docutils literal notranslate"><span class="pre">AbstractStorageMemoryRegion</span></code>
 &gt; that meant “here is a memory region and somewhere reachable from here exists
 &gt; another region of type T”. Or even multiple regions with different
 &gt; identifiers. This wouldn’t specify how the memory is reachable, but it would
@@ -212,7 +203,7 @@ invalidation for free.</p>
 symbolic-region-based-on-a-metadata-symbol (though we can make a new region
 class for that if we eg. want it typed). The problem is that the relation
 between such storage region and its parent object region is essentially
-immaterial, similarly to the relation between <code class="docutils literal"><span class="pre">SymbolRegionValue</span></code> and its parent
+immaterial, similarly to the relation between <code class="docutils literal notranslate"><span class="pre">SymbolRegionValue</span></code> and its parent
 region. Region contents are mutable: today the abstract storage is reachable
 from its parent object, tomorrow it’s not, and maybe something else becomes
 reachable, something that isn’t even abstract. So the parent region for the
@@ -226,7 +217,7 @@ the job.</p>
 change the data after the object is constructed - so this region’s contents are
 essentially immutable. For the future, i feel as if it is a dead end.</p>
 <p>I’d like to consider another funny example. Suppose we’re trying to model</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="p">.</span> <span class="n">Consider</span><span class="o">::</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="p">.</span> <span class="n">Consider</span><span class="o">::</span>
 
   <span class="kt">void</span> <span class="n">bar</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">);</span>
 
@@ -242,12 +233,12 @@ essentially immutable. For the future, i feel as if it is a dead end.</p>
   <span class="p">}</span>
 </pre></div>
 </div>
-<p>The checker doesn’t totally need to ensure that <code class="docutils literal"><span class="pre">*a</span> <span class="pre">==</span> <span class="pre">1</span></code> passes - even though the
-pointer was unique, it could theoretically have <code class="docutils literal"><span class="pre">.get()</span></code>-ed above and the code
+<p>The checker doesn’t totally need to ensure that <code class="docutils literal notranslate"><span class="pre">*a</span> <span class="pre">==</span> <span class="pre">1</span></code> passes - even though the
+pointer was unique, it could theoretically have <code class="docutils literal notranslate"><span class="pre">.get()</span></code>-ed above and the code
 could of course break the uniqueness invariant (though we’d probably want it).
-The checker can say that “even if <code class="docutils literal"><span class="pre">*a</span></code> did escape, it was not because it was
+The checker can say that “even if <code class="docutils literal notranslate"><span class="pre">*a</span></code> did escape, it was not because it was
 stuffed directly into bar()”.</p>
-<p>The checker’s direct responsibility, however, is to solve the <code class="docutils literal"><span class="pre">*b</span> <span class="pre">==</span> <span class="pre">2</span></code> thing
+<p>The checker’s direct responsibility, however, is to solve the <code class="docutils literal notranslate"><span class="pre">*b</span> <span class="pre">==</span> <span class="pre">2</span></code> thing
 (which is in fact the problem we’re dealing with in this patch - escaping the
 storage region of the object).</p>
 <p>So we’re talking about one more operation over the program state (scanning
@@ -297,7 +288,7 @@ FunctionDecl’s body in a body farm to have a local variable, even if such
 variable doesn’t actually exist, even if it cannot be seen from outside the
 function call. I’m not seeing immediate practical difference between “it does
 actually exist” and “it doesn’t actually exist, just a handy abstraction”.
-Similarly, i think it’s fine if we have a <code class="docutils literal"><span class="pre">CXXRecordDecl</span></code> with
+Similarly, i think it’s fine if we have a <code class="docutils literal notranslate"><span class="pre">CXXRecordDecl</span></code> with
 implementation-defined contents, and try to farm up a member variable as a handy
 abstraction (we don’t even need to know its name or offset, only that it’s there
 somewhere).</p>
@@ -338,7 +329,7 @@ back to the original trivial patch.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

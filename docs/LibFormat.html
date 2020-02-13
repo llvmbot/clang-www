@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>LibFormat &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Clang Plugins" href="ClangPlugins.html" />
     <link rel="prev" title="LibTooling" href="LibTooling.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>LibFormat</span></h2>
@@ -59,14 +50,14 @@ checkout <a class="reference internal" href="ClangFormat.html"><span class="doc"
 </div>
 <div class="section" id="interface">
 <h2>Interface<a class="headerlink" href="#interface" title="Permalink to this headline">¶</a></h2>
-<p>The core routine of LibFormat is <code class="docutils literal"><span class="pre">reformat()</span></code>:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">tooling</span><span class="o">::</span><span class="n">Replacements</span> <span class="n">reformat</span><span class="p">(</span><span class="k">const</span> <span class="n">FormatStyle</span> <span class="o">&amp;</span><span class="n">Style</span><span class="p">,</span> <span class="n">Lexer</span> <span class="o">&amp;</span><span class="n">Lex</span><span class="p">,</span>
+<p>The core routine of LibFormat is <code class="docutils literal notranslate"><span class="pre">reformat()</span></code>:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">tooling</span><span class="o">::</span><span class="n">Replacements</span> <span class="n">reformat</span><span class="p">(</span><span class="k">const</span> <span class="n">FormatStyle</span> <span class="o">&amp;</span><span class="n">Style</span><span class="p">,</span> <span class="n">Lexer</span> <span class="o">&amp;</span><span class="n">Lex</span><span class="p">,</span>
                                <span class="n">SourceManager</span> <span class="o">&amp;</span><span class="n">SourceMgr</span><span class="p">,</span>
                                <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">CharSourceRange</span><span class="o">&gt;</span> <span class="n">Ranges</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>This reads a token stream out of the lexer <code class="docutils literal"><span class="pre">Lex</span></code> and reformats all the code
-ranges in <code class="docutils literal"><span class="pre">Ranges</span></code>. The <code class="docutils literal"><span class="pre">FormatStyle</span></code> controls basic decisions made during
+<p>This reads a token stream out of the lexer <code class="docutils literal notranslate"><span class="pre">Lex</span></code> and reformats all the code
+ranges in <code class="docutils literal notranslate"><span class="pre">Ranges</span></code>. The <code class="docutils literal notranslate"><span class="pre">FormatStyle</span></code> controls basic decisions made during
 formatting. A list of options can be found under <a class="reference internal" href="#style-options"><span class="std std-ref">Style Options</span></a>.</p>
 <p>The style options are described in <a class="reference internal" href="ClangFormatStyleOptions.html"><span class="doc">Clang-Format Style Options</span></a>.</p>
 </div>
@@ -75,7 +66,7 @@ formatting. A list of options can be found under <a class="reference internal" h
 <p>The style options describe specific formatting options that can be used in
 order to make <cite>ClangFormat</cite> comply with different style guides. Currently,
 two style guides are hard-coded:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">/// Returns a format style complying with the LLVM coding standards:</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="c1">/// Returns a format style complying with the LLVM coding standards:</span>
 <span class="c1">/// https://llvm.org/docs/CodingStandards.html.</span>
 <span class="n">FormatStyle</span> <span class="nf">getLLVMStyle</span><span class="p">();</span>
 
@@ -106,7 +97,7 @@ through the <cite>-style</cite> option.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

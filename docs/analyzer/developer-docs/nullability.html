@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>3.4. Nullability Checks &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="3.5. Region Store" href="RegionStore.html" />
     <link rel="prev" title="3.3. Initializer List" href="InitializerLists.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>3.4. Nullability Checks</span></h2>
@@ -53,14 +44,14 @@ These checks intended to use the annotations that is described in this
 RFC: <a class="reference external" href="http://lists.cs.uiuc.edu/pipermail/cfe-dev/2015-March/041798.html">http://lists.cs.uiuc.edu/pipermail/cfe-dev/2015-March/041798.html</a>.</p>
 <p>Let’s consider the following 2 categories:</p>
 <p><strong>1) nullable</strong></p>
-<p>If a pointer <code class="docutils literal"><span class="pre">p</span></code> has a nullable annotation and no explicit null check or assert, we should warn in the following cases:</p>
+<p>If a pointer <code class="docutils literal notranslate"><span class="pre">p</span></code> has a nullable annotation and no explicit null check or assert, we should warn in the following cases:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">p</span></code> gets implicitly converted into nonnull pointer, for example, we are passing it to a function that takes a nonnull parameter.</li>
-<li><code class="docutils literal"><span class="pre">p</span></code> gets dereferenced</li>
+<li><code class="docutils literal notranslate"><span class="pre">p</span></code> gets implicitly converted into nonnull pointer, for example, we are passing it to a function that takes a nonnull parameter.</li>
+<li><code class="docutils literal notranslate"><span class="pre">p</span></code> gets dereferenced</li>
 </ul>
 <p>Taking a branch on nullable pointers are the same like taking branch on null unspecified pointers.</p>
 <p>Explicit cast from nullable to nonnul:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">__nullable</span> <span class="n">id</span> <span class="n">foo</span><span class="p">;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">__nullable</span> <span class="n">id</span> <span class="n">foo</span><span class="p">;</span>
 <span class="n">id</span> <span class="n">bar</span> <span class="o">=</span> <span class="n">foo</span><span class="p">;</span>
 <span class="n">takesNonNull</span><span class="p">((</span><span class="n">_nonnull</span><span class="p">)</span> <span class="n">bar</span><span class="p">);</span> <span class="c1">// should not warn here (backward compatibility hack)</span>
 <span class="n">anotherTakesNonNull</span><span class="p">(</span><span class="n">bar</span><span class="p">);</span> <span class="c1">// would be great to warn here, but not necessary(*)</span>
@@ -74,7 +65,7 @@ RFC: <a class="reference external" href="http://lists.cs.uiuc.edu/pipermail/cfe-
 <li>When there is an explicit cast from nonnull to nullable I will trust the cast (it is probable there for a reason, because this cast does not suppress any warnings or errors).</li>
 <li>But what should we do about null checks?:</li>
 </ul>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">__nonnull</span> <span class="n">id</span> <span class="nf">takesNonnull</span><span class="p">(</span><span class="n">__nonnull</span> <span class="n">id</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">__nonnull</span> <span class="n">id</span> <span class="nf">takesNonnull</span><span class="p">(</span><span class="n">__nonnull</span> <span class="n">id</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">nil</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// Defensive backward compatible code:</span>
         <span class="p">....</span>
@@ -117,7 +108,7 @@ RFC: <a class="reference external" href="http://lists.cs.uiuc.edu/pipermail/cfe-
 <div class="section" id="inlining">
 <h2>3.4.1. Inlining<a class="headerlink" href="#inlining" title="Permalink to this headline">¶</a></h2>
 <p>A symbol may need to be treated differently inside an inlined body. For example, consider these conversions from nonnull to nullable in presence of inlining:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">getNonnull</span><span class="p">();</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">getNonnull</span><span class="p">();</span>
 <span class="n">takesNullable</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
 <span class="n">takesNonnull</span><span class="p">(</span><span class="n">obj</span><span class="p">);</span>
 
@@ -131,7 +122,7 @@ RFC: <a class="reference external" href="http://lists.cs.uiuc.edu/pipermail/cfe-
 <div class="section" id="annotations-on-multi-level-pointers">
 <h2>3.4.2. Annotations on multi level pointers<a class="headerlink" href="#annotations-on-multi-level-pointers" title="Permalink to this headline">¶</a></h2>
 <p>Tracking multiple levels of annotations for pointers pointing to pointers would make the checker more complicated, because this way a vector of nullability qualifiers would be needed to be tracked for each symbol. This is not a big caveat, since once the top level pointer is dereferenced, the symvol for the inner pointer will have the nullability information. The lack of multi level annotation tracking only observable, when multiple levels of pointers are passed to a function which has a parameter with multiple levels of annotations. So for now the checker support the top level nullability qualifiers only.:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="o">*</span> <span class="n">__nonnull</span> <span class="o">*</span> <span class="n">__nullable</span> <span class="n">p</span><span class="p">;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="o">*</span> <span class="n">__nonnull</span> <span class="o">*</span> <span class="n">__nullable</span> <span class="n">p</span><span class="p">;</span>
 <span class="kt">int</span> <span class="o">**</span> <span class="n">q</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
 <span class="n">takesStarNullableStarNullable</span><span class="p">(</span><span class="n">q</span><span class="p">);</span>
 </pre></div>
@@ -166,7 +157,7 @@ RFC: <a class="reference external" href="http://lists.cs.uiuc.edu/pipermail/cfe-
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

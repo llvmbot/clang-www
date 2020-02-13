@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Matching the Clang AST &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ASTImporter: Merging Clang ASTs" href="LibASTImporter.html" />
     <link rel="prev" title="Tutorial for building tools using LibTooling and LibASTMatchers" href="LibASTMatchersTutorial.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>Matching the Clang AST</span></h2>
@@ -67,13 +58,13 @@ calling creator functions that allow building up a tree of matchers, where
 inner matchers are used to make the match more specific.</p>
 <p>For example, to create a matcher that matches all class or union declarations
 in the AST of a translation unit, you can call <a class="reference external" href="LibASTMatchersReference.html#recordDecl0Anchor">recordDecl()</a>.  To narrow the match down,
-for example to find all class or union declarations with the name “<code class="docutils literal"><span class="pre">Foo</span></code>”,
+for example to find all class or union declarations with the name “<code class="docutils literal notranslate"><span class="pre">Foo</span></code>”,
 insert a <a class="reference external" href="LibASTMatchersReference.html#hasName0Anchor">hasName</a> matcher: the
-call <code class="docutils literal"><span class="pre">recordDecl(hasName(&quot;Foo&quot;))</span></code> returns a matcher that matches classes or
-unions that are named “<code class="docutils literal"><span class="pre">Foo</span></code>”, in any namespace.  By default, matchers that
+call <code class="docutils literal notranslate"><span class="pre">recordDecl(hasName(&quot;Foo&quot;))</span></code> returns a matcher that matches classes or
+unions that are named “<code class="docutils literal notranslate"><span class="pre">Foo</span></code>”, in any namespace.  By default, matchers that
 accept multiple inner matchers use an implicit <a class="reference external" href="LibASTMatchersReference.html#allOf0Anchor">allOf()</a>.  This allows further narrowing
 down the match, for example to match all classes that are derived from
-“<code class="docutils literal"><span class="pre">Bar</span></code>”: <code class="docutils literal"><span class="pre">recordDecl(hasName(&quot;Foo&quot;),</span> <span class="pre">isDerivedFrom(&quot;Bar&quot;))</span></code>.</p>
+“<code class="docutils literal notranslate"><span class="pre">Bar</span></code>”: <code class="docutils literal notranslate"><span class="pre">recordDecl(hasName(&quot;Foo&quot;),</span> <span class="pre">isDerivedFrom(&quot;Bar&quot;))</span></code>.</p>
 </div>
 <div class="section" id="how-to-create-a-matcher">
 <h2>How to create a matcher<a class="headerlink" href="#how-to-create-a-matcher" title="Permalink to this headline">¶</a></h2>
@@ -104,8 +95,8 @@ attributes on the node.</li>
 for a certain task.  Often you will want to then do something with the nodes
 that were matched, like building source code transformations.</p>
 <p>To that end, matchers that match specific AST nodes (so called node matchers)
-are bindable; for example, <code class="docutils literal"><span class="pre">recordDecl(hasName(&quot;MyClass&quot;)).bind(&quot;id&quot;)</span></code> will
-bind the matched <code class="docutils literal"><span class="pre">recordDecl</span></code> node to the string “<code class="docutils literal"><span class="pre">id</span></code>”, to be later
+are bindable; for example, <code class="docutils literal notranslate"><span class="pre">recordDecl(hasName(&quot;MyClass&quot;)).bind(&quot;id&quot;)</span></code> will
+bind the matched <code class="docutils literal notranslate"><span class="pre">recordDecl</span></code> node to the string “<code class="docutils literal notranslate"><span class="pre">id</span></code>”, to be later
 retrieved in the <a class="reference external" href="https://clang.llvm.org/doxygen/classclang_1_1ast__matchers_1_1MatchFinder_1_1MatchCallback.html">match callback</a>.</p>
 </div>
 <div class="section" id="writing-your-own-matchers">
@@ -113,21 +104,21 @@ retrieved in the <a class="reference external" href="https://clang.llvm.org/doxy
 <p>There are multiple different ways to define a matcher, depending on its type
 and flexibility.</p>
 <div class="section" id="variadicdyncastallofmatcher-base-derived">
-<h3><code class="docutils literal"><span class="pre">VariadicDynCastAllOfMatcher&lt;Base,</span> <span class="pre">Derived&gt;</span></code><a class="headerlink" href="#variadicdyncastallofmatcher-base-derived" title="Permalink to this headline">¶</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">VariadicDynCastAllOfMatcher&lt;Base,</span> <span class="pre">Derived&gt;</span></code><a class="headerlink" href="#variadicdyncastallofmatcher-base-derived" title="Permalink to this headline">¶</a></h3>
 <p>Those match all nodes of type <em>Base</em> if they can be dynamically casted to
 <em>Derived</em>.  The names of those matchers are nouns, which closely resemble
-<em>Derived</em>.  <code class="docutils literal"><span class="pre">VariadicDynCastAllOfMatchers</span></code> are the backbone of the matcher
+<em>Derived</em>.  <code class="docutils literal notranslate"><span class="pre">VariadicDynCastAllOfMatchers</span></code> are the backbone of the matcher
 hierarchy.  Most often, your match expression will start with one of them, and
 you can <a class="reference internal" href="#astmatchers-bind"><span class="std std-ref">bind</span></a> the node they represent to ids for later
 processing.</p>
-<p><code class="docutils literal"><span class="pre">VariadicDynCastAllOfMatchers</span></code> are callable classes that model variadic
+<p><code class="docutils literal notranslate"><span class="pre">VariadicDynCastAllOfMatchers</span></code> are callable classes that model variadic
 template functions in C++03.  They take an arbitrary number of
-<code class="docutils literal"><span class="pre">Matcher&lt;Derived&gt;</span></code> and return a <code class="docutils literal"><span class="pre">Matcher&lt;Base&gt;</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">Matcher&lt;Derived&gt;</span></code> and return a <code class="docutils literal notranslate"><span class="pre">Matcher&lt;Base&gt;</span></code>.</p>
 </div>
 <div class="section" id="ast-matcher-p-type-name-paramtype-param">
-<h3><code class="docutils literal"><span class="pre">AST_MATCHER_P(Type,</span> <span class="pre">Name,</span> <span class="pre">ParamType,</span> <span class="pre">Param)</span></code><a class="headerlink" href="#ast-matcher-p-type-name-paramtype-param" title="Permalink to this headline">¶</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">AST_MATCHER_P(Type,</span> <span class="pre">Name,</span> <span class="pre">ParamType,</span> <span class="pre">Param)</span></code><a class="headerlink" href="#ast-matcher-p-type-name-paramtype-param" title="Permalink to this headline">¶</a></h3>
 <p>Most matcher definitions use the matcher creation macros.  Those define both
-the matcher of type <code class="docutils literal"><span class="pre">Matcher&lt;Type&gt;</span></code> itself, and a matcher-creation function
+the matcher of type <code class="docutils literal notranslate"><span class="pre">Matcher&lt;Type&gt;</span></code> itself, and a matcher-creation function
 named <em>Name</em> that takes a parameter of type <em>ParamType</em> and returns the
 corresponding matcher.</p>
 <p>There are multiple matcher definition macros that deal with polymorphic return
@@ -137,7 +128,7 @@ values and different parameter counts.  See <a class="reference external" href="
 <span id="astmatchers-writing"></span><h3>Matcher creation functions<a class="headerlink" href="#matcher-creation-functions" title="Permalink to this headline">¶</a></h3>
 <p>Matchers are generated by nesting calls to matcher creation functions.  Most of
 the time those functions are either created by using
-<code class="docutils literal"><span class="pre">VariadicDynCastAllOfMatcher</span></code> or the matcher creation macros (see below).
+<code class="docutils literal notranslate"><span class="pre">VariadicDynCastAllOfMatcher</span></code> or the matcher creation macros (see below).
 The free-standing functions are an indication that this matcher is just a
 combination of other matchers, as is for example the case with <a class="reference external" href="LibASTMatchersReference.html#callee1Anchor">callee</a>.</p>
 </div>
@@ -160,7 +151,7 @@ combination of other matchers, as is for example the case with <a class="referen
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

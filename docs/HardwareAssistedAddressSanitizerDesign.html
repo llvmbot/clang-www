@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Hardware-assisted AddressSanitizer Design Documentation &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Constant Interpreter" href="ConstantInterpreter.html" />
     <link rel="prev" title="ABI tags" href="ItaniumMangleAbiTags.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>Hardware-assisted AddressSanitizer Design Documentation</span></h2>
@@ -117,7 +108,7 @@ convention that</p>
 size of the memory access.</li>
 </ul>
 <p>Currently, the following sequence is used:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>// int foo(int *a) { return *a; }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>// int foo(int *a) { return *a; }
 // clang -O2 --target=aarch64-linux-android30 -fsanitize=hwaddress -S -o - load.c
 [...]
 foo:
@@ -197,15 +188,15 @@ instruction sequence needs to be used to add the tag to the address,
 because the tag would otherwise take the address outside of the small code
 model (4GB on AArch64). No changes are required when the address is taken
 via the GOT because the address stored in the GOT will contain the tag.</li>
-<li>An associated <code class="docutils literal"><span class="pre">hwasan_globals</span></code> section is emitted for each tagged global,
+<li>An associated <code class="docutils literal notranslate"><span class="pre">hwasan_globals</span></code> section is emitted for each tagged global,
 which indicates the address of the global, its size and its tag.  These
-sections are concatenated by the linker into a single <code class="docutils literal"><span class="pre">hwasan_globals</span></code>
+sections are concatenated by the linker into a single <code class="docutils literal notranslate"><span class="pre">hwasan_globals</span></code>
 section that is enumerated by the runtime (via an ELF note) when a binary
 is loaded and the memory is tagged accordingly.</li>
 </ul>
 </div></blockquote>
 <p>A complete example is given below:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>// int x = 1; int *f() { return &amp;x; }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>// int x = 1; int *f() { return &amp;x; }
 // clang -O2 --target=aarch64-linux-android30 -fsanitize=hwaddress -S -o - global.c
 
 [...]
@@ -331,7 +322,7 @@ similar approaches (“lock &amp; key”).</li>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

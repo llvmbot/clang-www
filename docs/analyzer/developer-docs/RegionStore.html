@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>3.5. Region Store &#8212; Clang 11 documentation</title>
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '11',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Thread Safety Analysis" href="../../ThreadSafetyAnalysis.html" />
     <link rel="prev" title="3.4. Nullability Checks" href="nullability.html" /> 
-  </head>
-  <body>
+  </head><body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Clang 11 documentation</span></a></h1>
         <h2 class="heading"><span>3.5. Region Store</span></h2>
@@ -49,11 +40,11 @@
   <div class="section" id="region-store">
 <h1>3.5. Region Store<a class="headerlink" href="#region-store" title="Permalink to this headline">¶</a></h1>
 <p>The analyzer “Store” represents the contents of memory regions. It is an opaque
-functional data structure stored in each <code class="docutils literal"><span class="pre">ProgramState</span></code>; the only class that
+functional data structure stored in each <code class="docutils literal notranslate"><span class="pre">ProgramState</span></code>; the only class that
 can modify the store is its associated StoreManager.</p>
 <p>Currently (Feb. 2013), the only StoreManager implementation being used is
-<code class="docutils literal"><span class="pre">RegionStoreManager</span></code>. This store records bindings to memory regions using a
-“base region + offset” key. (This allows <code class="docutils literal"><span class="pre">*p</span></code> and <code class="docutils literal"><span class="pre">p[0]</span></code> to map to the same
+<code class="docutils literal notranslate"><span class="pre">RegionStoreManager</span></code>. This store records bindings to memory regions using a
+“base region + offset” key. (This allows <code class="docutils literal notranslate"><span class="pre">*p</span></code> and <code class="docutils literal notranslate"><span class="pre">p[0]</span></code> to map to the same
 location, among other benefits.)</p>
 <p>Regions are grouped into “clusters”, which roughly correspond to “regions with
 the same base region”. This allows certain operations to be more efficient,
@@ -61,40 +52,40 @@ such as invalidation.</p>
 <p>Regions that do not have a known offset use a special “symbolic” offset. These
 keys store both the original region, and the “concrete offset region” – the
 last region whose offset is entirely concrete. (For example, in the expression
-<code class="docutils literal"><span class="pre">foo.bar[1][i].baz</span></code>, the concrete offset region is the array <code class="docutils literal"><span class="pre">foo.bar[1]</span></code>,
-since that has a known offset from the start of the top-level <code class="docutils literal"><span class="pre">foo</span></code> struct.)</p>
+<code class="docutils literal notranslate"><span class="pre">foo.bar[1][i].baz</span></code>, the concrete offset region is the array <code class="docutils literal notranslate"><span class="pre">foo.bar[1]</span></code>,
+since that has a known offset from the start of the top-level <code class="docutils literal notranslate"><span class="pre">foo</span></code> struct.)</p>
 <div class="section" id="binding-invalidation">
 <h2>3.5.1. Binding Invalidation<a class="headerlink" href="#binding-invalidation" title="Permalink to this headline">¶</a></h2>
 <p>Supporting both concrete and symbolic offsets makes things a bit tricky. Here’s
 an example:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">foo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">foo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 <span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="n">foo</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>After the third assignment, nothing can be said about the value of <code class="docutils literal"><span class="pre">foo[0]</span></code>,
-because <code class="docutils literal"><span class="pre">foo[i]</span></code> may have overwritten it! Thus, <em>binding to a region with a
+<p>After the third assignment, nothing can be said about the value of <code class="docutils literal notranslate"><span class="pre">foo[0]</span></code>,
+because <code class="docutils literal notranslate"><span class="pre">foo[i]</span></code> may have overwritten it! Thus, <em>binding to a region with a
 symbolic offset invalidates the entire concrete offset region.</em> We know
-<code class="docutils literal"><span class="pre">foo[i]</span></code> is somewhere within <code class="docutils literal"><span class="pre">foo</span></code>, so we don’t have to invalidate
+<code class="docutils literal notranslate"><span class="pre">foo[i]</span></code> is somewhere within <code class="docutils literal notranslate"><span class="pre">foo</span></code>, so we don’t have to invalidate
 anything else, but we do have to be conservative about all other bindings within
-<code class="docutils literal"><span class="pre">foo</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">foo</span></code>.</p>
 <p>Continuing the example:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">foo</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">foo</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
 <span class="n">foo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>After this latest assignment, nothing can be said about the value of <code class="docutils literal"><span class="pre">foo[i]</span></code>,
-because <code class="docutils literal"><span class="pre">foo[0]</span></code> may have overwritten it! <em>Binding to a region R with a
+<p>After this latest assignment, nothing can be said about the value of <code class="docutils literal notranslate"><span class="pre">foo[i]</span></code>,
+because <code class="docutils literal notranslate"><span class="pre">foo[0]</span></code> may have overwritten it! <em>Binding to a region R with a
 concrete offset invalidates any symbolic offset bindings whose concrete offset
-region is a super-region **or*</em> sub-region of R.* All we know about <code class="docutils literal"><span class="pre">foo[i]</span></code>
-is that it is somewhere within <code class="docutils literal"><span class="pre">foo</span></code>, so changing <em>anything</em> within <code class="docutils literal"><span class="pre">foo</span></code>
-might change <code class="docutils literal"><span class="pre">foo[i]</span></code>, and changing <em>all</em> of <code class="docutils literal"><span class="pre">foo</span></code> (or its base region) will
-<em>definitely</em> change <code class="docutils literal"><span class="pre">foo[i]</span></code>.</p>
-<p>This logic could be improved by using the current constraints on <code class="docutils literal"><span class="pre">i</span></code>, at the
+region is a super-region **or*</em> sub-region of R.* All we know about <code class="docutils literal notranslate"><span class="pre">foo[i]</span></code>
+is that it is somewhere within <code class="docutils literal notranslate"><span class="pre">foo</span></code>, so changing <em>anything</em> within <code class="docutils literal notranslate"><span class="pre">foo</span></code>
+might change <code class="docutils literal notranslate"><span class="pre">foo[i]</span></code>, and changing <em>all</em> of <code class="docutils literal notranslate"><span class="pre">foo</span></code> (or its base region) will
+<em>definitely</em> change <code class="docutils literal notranslate"><span class="pre">foo[i]</span></code>.</p>
+<p>This logic could be improved by using the current constraints on <code class="docutils literal notranslate"><span class="pre">i</span></code>, at the
 cost of speed. The latter case could also be improved by matching region kinds,
-i.e. changing <code class="docutils literal"><span class="pre">foo[0].a</span></code> is unlikely to affect <code class="docutils literal"><span class="pre">foo[i].b</span></code>, no matter what
-<code class="docutils literal"><span class="pre">i</span></code> is.</p>
-<p>For more detail, read through <code class="docutils literal"><span class="pre">RegionStoreManager::removeSubRegionBindings</span></code> in
+i.e. changing <code class="docutils literal notranslate"><span class="pre">foo[0].a</span></code> is unlikely to affect <code class="docutils literal notranslate"><span class="pre">foo[i].b</span></code>, no matter what
+<code class="docutils literal notranslate"><span class="pre">i</span></code> is.</p>
+<p>For more detail, read through <code class="docutils literal notranslate"><span class="pre">RegionStoreManager::removeSubRegionBindings</span></code> in
 RegionStore.cpp.</p>
 </div>
 <div class="section" id="objcivarregions">
@@ -125,7 +116,7 @@ arithmetic.</p>
 <p>Region invalidation typically does even more than this, however. Because it
 usually represents the complete escape of a region from the analyzer’s model,
 its <em>contents</em> must also be transitively invalidated. (For example, if a region
-<code class="docutils literal"><span class="pre">p</span></code> of type <code class="docutils literal"><span class="pre">int</span> <span class="pre">**</span></code> is invalidated, the contents of <code class="docutils literal"><span class="pre">*p</span></code> and <code class="docutils literal"><span class="pre">**p</span></code> may
+<code class="docutils literal notranslate"><span class="pre">p</span></code> of type <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">**</span></code> is invalidated, the contents of <code class="docutils literal notranslate"><span class="pre">*p</span></code> and <code class="docutils literal notranslate"><span class="pre">**p</span></code> may
 have changed as well.) The algorithm that traverses this transitive closure of
 accessible regions is known as ClusterAnalysis, and is also used for finding
 all live bindings in the store (in order to throw away the dead ones). The name
@@ -147,7 +138,7 @@ this value is used as the value of the original region. The search ends when
 the base region is reached, at which point the RegionStore will pick an
 appropriate default value for the region (usually a symbolic value, but
 sometimes zero, for static data, or “uninitialized”, for stack variables).</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">manyInts</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">manyInts</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
 <span class="n">manyInts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>   <span class="c1">// Creates a Direct binding for manyInts[1].</span>
 <span class="n">print</span><span class="p">(</span><span class="n">manyInts</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span> <span class="c1">// Retrieves the Direct binding for manyInts[1];</span>
 <span class="n">print</span><span class="p">(</span><span class="n">manyInts</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span> <span class="c1">// There is no Direct binding for manyInts[0].</span>
@@ -185,7 +176,7 @@ different values, instead of one value that will appear several times. Because
 of this, the store manager has to reconstruct the subregion chain on top of the
 LazyCompoundVal region, and look up <em>that</em> region in the previous store.</p>
 <p>Here’s a concrete example:</p>
-<div class="highlight-cpp"><div class="highlight"><pre><span></span><span class="n">CGPoint</span> <span class="n">p</span><span class="p">;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">CGPoint</span> <span class="n">p</span><span class="p">;</span>
 <span class="n">p</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>       <span class="c1">// A Direct binding is made to the FieldRegion &#39;p.x&#39;.</span>
 <span class="n">CGPoint</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span> <span class="c1">// A LazyCompoundVal is created for &#39;p&#39;, along with a</span>
                 <span class="c1">// snapshot of the current store state. This value is then</span>
@@ -217,7 +208,7 @@ LazyCompoundVal region, and look up <em>that</em> region in the previous store.<
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2007-2020, The Clang Team.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>
